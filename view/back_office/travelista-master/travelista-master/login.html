@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Travelista</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet">
+    <style>
+        /* Reset and styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url('img/banner-bg.jpg') no-repeat center center/cover;
+            color: #fff;
+        }
+
+        .login-container {
+            background: rgba(0, 0, 0, 0.75);
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-container h2 {
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .input-field {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-field input {
+            width: 100%;
+            padding: 12px 16px;
+            padding-left: 40px;
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .input-field i {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            color: #aaa;
+            font-size: 18px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #6e8efb;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #5d7bec;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        /* Style for footer link */
+        .footer-link {
+            margin-top: 15px;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        .footer-link a {
+            color: #6e8efb;
+            text-decoration: none;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Welcome Back to Travelista</h2>
+        <div class="input-field">
+            <i class="fa fa-user"></i>
+            <input type="text" id="username" placeholder="Username">
+        </div>
+        <div class="input-field">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="password" placeholder="Password">
+        </div>
+        <button class="login-btn" onclick="validateLogin()">Login</button>
+        <div id="error-message" class="error-message"></div>
+        <div class="footer-link">
+            Don't have an account? <a href="sign up.html">Sign up</a>
+        </div>
+    </div>
+
+    <script>
+        function validateLogin() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMessage = document.getElementById("error-message");
+
+            errorMessage.textContent = "";
+
+            if (!username || !password) {
+                errorMessage.textContent = "Both fields are required.";
+            } else if (username !== "user" || password !== "pass") {
+                errorMessage.textContent = "Incorrect username or password.";
+            } else {
+                alert("Login successful!");
+                // Redirect to dashboard or main page
+                window.location.href = "dashboard.html";
+            }
+        }
+    </script>
+</body>
+</html>
