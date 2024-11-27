@@ -1,0 +1,218 @@
+/* Reset basic styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Body styling with a gradient background */
+body {
+    background-image: url(bg.jpg);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+/*body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0eafc, #cfdef3);
+    padding: 20px;
+    animation: fadeIn 1s ease-in-out;
+}*/
+
+/* Form styling */
+form {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    animation: slideIn 1s ease-out forwards;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+form:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+}
+
+h2 {
+    text-align: center;
+    color: #007BFF;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    animation: bounceIn 1.2s ease;
+}
+
+/* Label and Input Styling */
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #333333;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+    animation-delay: 0.2s;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+    font-size: 1rem;
+    opacity: 0;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    animation: slideInFromLeft 0.8s ease forwards;
+    animation-delay: 0.2s;
+}
+
+/* Input focus styling */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+/* Textarea Styling */
+textarea {
+    resize: vertical;
+}
+
+/* Submit Button with Bounce Effect */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 25px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    animation: bounceIn 1s ease forwards;
+    animation-delay: 0.4s;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Keyframes for Animations */
+
+/* Fade In Effect */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Slide In Effect for Form */
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Bounce In Effect for Header and Button */
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Slide in from Left Effect for Inputs */
+@keyframes slideInFromLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive Styling */
+@media (max-width: 600px) {
+    form {
+        padding: 25px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    button[type="submit"] {
+        font-size: 1rem;
+    }
+}
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+    text-align: center;
+  }
+  
+  .spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
