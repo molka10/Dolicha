@@ -271,6 +271,7 @@ $commandes = $commandeController->getAllCommandes();
                     <td data-label="Actions" class="action-links">
                         <a href="update_commande.php?id=<?php echo $commande['idcommande']; ?>">Update</a>
                         <a href="payer_commande.php">Payer</a>
+                        <a href="delete_commande.php?id=<?php echo $commande['idcommande']; ?>" class="delete-link" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

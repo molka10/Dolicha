@@ -232,22 +232,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </section>
 
-<h1>Update Cart</h1>
+    <h1>Update Cart</h1>
 
-<form method="POST" action="">
-    <label for="total">Total:</label>
-    <input type="text" id="total" name="total" value="<?php echo htmlspecialchars($cart['total']); ?>" required>
+<form method="POST" action="" style="max-width: 400px; margin: auto;">
+    <div style="margin-bottom: 15px;">
+        <label for="total">Total:</label>
+        <input type="number" id="total" name="total" value="<?php echo htmlspecialchars($cart['total']); ?>" readonly step="0.01" min="0" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
 
-    <label for="status">Status:</label>
-    <select id="status" name="status">
-        <option value="0" <?php echo $cart['status'] == 0 ? 'selected' : ''; ?>>Not Confirmed</option>
-        <option value="1" <?php echo $cart['status'] == 1 ? 'selected' : ''; ?>>Confirmed</option>
-    </select>
+    <div style="margin-bottom: 15px;">
+        <label for="status">Status:</label>
+        <select id="status" name="status" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <option value="0" <?php echo $cart['status'] == 0 ? 'selected' : ''; ?>>Not Confirmed</option>
+            <option value="1" <?php echo $cart['status'] == 1 ? 'selected' : ''; ?>>Confirmed</option>
+        </select>
+    </div>
 
-    <button type="submit">Update Cart</button>
+    <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Update Cart</button>
 </form>
 
-<a href="affichepanier.php" class="cancel-link">Cancel</a>
+<a href="affichepanier.php" class="cancel-link" style="display: block; text-align: center; margin-top: 15px; text-decoration: none; color: #007BFF;">Cancel</a>
 
 </body>
 </html>
