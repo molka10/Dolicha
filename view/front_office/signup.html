@@ -119,6 +119,17 @@
   <div class="form-box">
     <form method="POST" action="../../controller/userController.php" onsubmit="return validateForm()">
       <input type="hidden" name="action" value="signup">
+       
+      <div class="inputbox">
+        <input type="text" name="nom" id="nom" required>
+        <label for="Nom">Nom</label>
+      </div>
+
+      <div class="inputbox">
+        <div class="inputbox">
+          <input type="text" name="prenom" id="prenom" required>
+          <label for="Prenom">Prenom</label>
+        </div>
 
       <div class="inputbox">
         <input type="email" name="usermail" id="usermail" required>
@@ -176,6 +187,9 @@
 
 <script>
   function validateForm() {
+    var nom = document.getElementById("nom").value.trim();
+    var prenom = document.getElementById("prenom").value.trim(); 
+
     var email = document.getElementById("usermail").value.trim();
     var password = document.getElementById("password").value;
     var confirmPassword = document.getElementById("confirmPassword").value;
@@ -240,19 +254,7 @@
       alert("Corrigez les erreurs :\n" + errorMessage);
     }
 
-    // Redirection après validation réussie
-    if (isValid) {
-      // Récupérer le rôle sélectionné
-      var userRole = document.getElementById("userRole").value;
-      
-      if (userRole === "user") {
-        window.location.href = "index.html"; // Redirection vers la page utilisateur
-      } else if (userRole === "admin") {
-        window.location.href = "dashboard.html"; // Redirection vers la page admin
-      } else if (userRole === "vendeur") {
-        window.location.href = "vendeur.html"; // Redirection vers la page vendeur
-      }
-    }
+
 
     return isValid;
  

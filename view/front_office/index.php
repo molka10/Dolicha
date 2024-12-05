@@ -1,3 +1,17 @@
+<?php
+include_once '../../config.php'; // Include Database class
+require_once '../../controller/userController.php'; // Include user controller functions
+session_start(); // Démarre la session
+
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.html"); // Rediriger vers la page de connexion si non connecté
+    exit();
+}
+
+$db = (new Database())->getConnection();
+ob_end_clean();
+?>
 	<!DOCTYPE html>
 	<html lang="zxx" class="no-js">
 	<head>
@@ -83,7 +97,8 @@
 						  <li><a href=""</li>			          		
 						  <li><a href="hotels.html"fa fa-shopping-cart"></i>  shopping-cart</a></li>			          		          
 				          <li><a href="contact.html">Contact</a></li>
-						  <li><a href="login.html">login</a></li>
+						  <li><a href="signup.html">signup</a></li>
+				         <li><a href="login.html">login</a></li>
 				        </ul>
 				      </nav><!-- #nav-menu-container -->					      		  
 					</div>

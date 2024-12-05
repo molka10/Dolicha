@@ -1,12 +1,22 @@
 <?php
 require_once '../../../../config.php'; // Include Database class
 require_once '../../../../controller/userController.php'; // Include user controller functions
+session_start(); // Démarre la session
 
-// Initialize the database connection
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../../../../view/front_office/login.html"); // Rediriger vers la page de connexion si non connecté
+    exit();
+}
+
 $db = (new Database())->getConnection();
+ob_end_clean();
 
-// Fetch all users
-$users = getAllUsers($db);
+// Récupérer la valeur de recherche (si présente)
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Récupérer les utilisateurs (en incluant le critère de recherche si présent)
+$users = getAllUsers($db, $search);
 ?>
 
 <!DOCTYPE html>
@@ -15,9 +25,7 @@ $users = getAllUsers($db);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management</title>
-    <!-- CSS Stylesheet -->
     <link rel="stylesheet" href="view\back_office\dashboard.html"> <!-- Replace with actual path -->
-    
     <style>
         body {
             margin: 0;
@@ -180,26 +188,32 @@ $users = getAllUsers($db);
             <!-- Navbar -->
             <nav class="navbar">
                 <div>
-                    <input type="text" placeholder="Search products" style="padding: 8px 10px; border-radius: 4px; border: 1px solid #ddd;">
+                    <!-- Formulaire de recherche -->
+                    <form method="GET" action="basic-table.php" style="margin-bottom: 20px;">
+                        <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Rechercher..." style="padding: 8px 10px; border-radius: 4px; border: 1px solid #ddd;">
+                        <button type="submit" class="btn btn-primary">Rechercher</button>
+                    </form>
                 </div>
                 <div class="profile-info">
                     <img src="D:\xampp\htdocs\dolicha\view\back_office\assets\images\faces\face1.jpg" alt="Profile Picture"> <!-- Replace with actual image path -->
-                    <span>Henry Klein</span>
+                    <span><?= $_SESSION['user_name'] ?? 'molka' ?></span> <!-- Afficher le nom de l'utilisateur -->
                 </div>
             </nav>
-
-           
 
             <!-- Table Section -->
             <div class="card">
                 <h4>User List</h4>
+
                 <?php if (!empty($users)): ?>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
                                     <th>Email</th>
+                                    <th>Password</th>
                                     <th>Role</th>
                                     <th>Address</th>
                                     <th>Nationality</th>
@@ -212,7 +226,10 @@ $users = getAllUsers($db);
                                 <?php foreach ($users as $user): ?>
                                     <tr>
                                         <td><?= htmlspecialchars($user['id_user']) ?></td>
+                                        <td><?= htmlspecialchars($user['nom']) ?></td>
+                                        <td><?= htmlspecialchars($user['prenom']) ?></td>
                                         <td><?= htmlspecialchars($user['usermail']) ?></td>
+                                        <td><?= '********' ?></td> <!-- Always show 8 dots for the password -->
                                         <td><?= htmlspecialchars($user['userRole']) ?></td>
                                         <td><?= htmlspecialchars($user['adress']) ?></td>
                                         <td><?= htmlspecialchars($user['Nationalite']) ?></td>
@@ -224,10 +241,11 @@ $users = getAllUsers($db);
                                                 <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
                                                 <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                                             </form>
+                                            
                                             <form method="POST" action="../../../../view/front_office/signup.html" style="display:inline;">
-    <input type="hidden" name="action" value="add">
-    <button type="submit" class="btn btn-success">Add User</button>
- </form>
+                                                <input type="hidden" name="action" value="add">
+                                                <button type="submit" class="btn btn-success">Add User</button>
+                                            </form>
 
                                             <form method="GET" action="edit_user.php" style="display:inline;">
                                                 <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">

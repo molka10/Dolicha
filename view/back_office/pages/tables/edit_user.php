@@ -3,10 +3,12 @@ require_once '../../../../config.php'; // Include Database class
 require_once '../../../../controller/userController.php'; // Include user controller functions
 
 // Fetch the selected user
+$user = null;
 if (isset($_GET['id_user'])) {
     $id_user = $_GET['id_user'];
     $db = (new Database())->getConnection();
-    $user = getUserById($db, $id_user);
+    $user = getUserById($db, $id_user); // Assurez-vous que cette fonction retourne un tableau utilisateur
+    ob_end_clean();
 }
 ?>
 <!DOCTYPE html>
@@ -166,6 +168,16 @@ if (isset($_GET['id_user'])) {
                     <form method="POST" action="../../../../controller/userController.php">
                         <input type="hidden" name="action" value="edit">
                         <input type="hidden" name="id_user" value="<?= htmlspecialchars($user['id_user']) ?>">
+
+                        <div class="inputbox">
+                            <label>Nom:</label>
+                            <input type="text" name="Nom" value="<?= htmlspecialchars($user['nom']) ?>" required>
+                        </div>
+
+                        <div class="inputbox">
+                            <label>Prénom:</label>
+                            <input type="text" name="Prenom" value="<?= htmlspecialchars($user['prenom']) ?>" required>
+                        </div>
 
                         <div class="inputbox">
                             <label>Email:</label>
