@@ -3,6 +3,20 @@
 include '../controller/EventC.php';
 $c = new EventC();
 $tab = $c->listEvents();
+// Get query parameters
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$sortColumn = isset($_GET['sort']) ? $_GET['sort'] : 'date';
+$sortOrder = isset($_GET['order']) ? $_GET['order'] : 'ASC';
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$eventsPerPage = 4;
+$offset = ($page - 1) * $eventsPerPage;
+
+// Fetch the filtered and sorted events
+$tab = $c->searchAndSortEvents($offset, $eventsPerPage, $search, $sortColumn, $sortOrder);
+
+// Get total count for pagination
+$totalEvents = $c->countEvents($search);
+$totalPages = ceil($totalEvents / $eventsPerPage);
 
 // Vérification si un fichier image a été envoyé
 if(isset($_FILES['image'])){
@@ -34,6 +48,11 @@ if(isset($_FILES['image'])){
 	<!DOCTYPE html>
 	<html lang="zxx" class="no-js">
 	<head>
+		<style>
+	
+
+
+		</style>
 		<!-- Mobile Specific Meta -->
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<!-- Favicon-->
@@ -62,6 +81,9 @@ if(isset($_FILES['image'])){
 			<link rel="stylesheet" href="css/animate.min.css">
 			<link rel="stylesheet" href="css/owl.carousel.css">				
 			<link rel="stylesheet" href="css/main.css">
+			<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 		</head>
 		<body>	
 			<header id="header">
@@ -215,46 +237,128 @@ if(isset($_FILES['image'])){
 		            </div>						
 					
 			
-
-			<!-- Start home-about Area -->
-			<section class="ftco-section ftco-no-pt">
-			<div class="row">
-    <?php foreach ($tab as $event): ?>
-        <div class="col-lg-4">
-            <div class="single-destinations">
-                <!-- Dynamic image -->
-                <div class="thumb">
-                    <img class="thumb_img" src="./images/uploads/<?= $event['image']; ?>" alt="<?= $event['nom']; ?>">
-                </div>
-                <div class="details">
-                    <h4><?= $event['nom']; ?></h4>
-                    <p><?= $event['lieu']; ?></p>
-                    <ul class="package-list">
-                        <li class="d-flex justify-content-between align-items-center">
-                            <span>Duration</span>
-                            <span><?= $event['duration']; ?></span>
-                        </li>
-                        <li class="d-flex justify-content-between align-items-center">
-                            <span>Date</span>
-                            <span><?= $event['date']; ?></span>
-                        </li>
-                        <li class="d-flex justify-content-between align-items-center">
-                            <span>Price per person</span>
-                            <a href="#" class="price-btn"><?= $event['prix']; ?> Dt</a>
-                        </li>                                                     
-                    </ul>
-                </div>
-            </div>
+					<div class="search-sort-container">
+    <!-- Search Bar -->
+    <form method="GET" action="" class="form-inline search-form">
+        <div class="input-group">
+            <input 
+                type="text" 
+                class="form-control" 
+                name="search" 
+                placeholder="Search events..." 
+                value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+            >
+            <button type="submit" class="btn btn-primary">Search</button>
         </div>
-    <?php endforeach; ?>
+        
+        <!-- Sort Dropdown -->
+        <div class="dropdown sort-dropdown">
+            <button 
+                class="btn btn-secondary dropdown-toggle" 
+                type="button" 
+                id="sortMenuButton" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false">
+                Sort by: <?= isset($_GET['sort']) && $_GET['sort'] === 'prix' ? ($_GET['order'] === 'DESC' ? 'Price: High to Low' : 'Price: Low to High') : 'Date' ?>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="sortMenuButton">
+                <li>
+                    <a 
+                        class="dropdown-item" 
+                        href="?search=<?= urlencode($_GET['search'] ?? '') ?>&sort=prix&order=ASC">
+                        Price: Low to High
+                    </a>
+                </li>
+                <li>
+                    <a 
+                        class="dropdown-item" 
+                        href="?search=<?= urlencode($_GET['search'] ?? '') ?>&sort=prix&order=DESC">
+                        Price: High to Low
+                    </a>
+                </li>
+                <li>
+                    <a 
+                        class="dropdown-item" 
+                        href="?search=<?= urlencode($_GET['search'] ?? '') ?>&sort=date&order=ASC">
+                        Date (Oldest)
+                    </a>
+                </li>
+                <li>
+                    <a 
+                        class="dropdown-item" 
+                        href="?search=<?= urlencode($_GET['search'] ?? '') ?>&sort=date&order=DESC">
+                        Date (Newest)
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </form>
+</div>
 </div>
 
-
+			<!-- Start home-about Area -->
+<!-- Start home-about Area -->
+<section class="ftco-section ftco-no-pt">
+    <div class="container">
+        <div class="row event-container">
+            <?php foreach ($tab as $event): ?>
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="single-destination card">
+                    <!-- Dynamic image -->
+                    <div class="thumb card-image">
+                        <img class="thumb_img" src="./images/uploads/<?= $event['image']; ?>" alt="<?= $event['nom']; ?>">
+                    </div>
+                    <div class="details card-content">
+                        <h4 class="event-title"><?= $event['nom']; ?></h4>
+                        <p class="event-location"><?= $event['lieu']; ?></p>
+                        <ul class="package-list">
+                            <li class="d-flex justify-content-between align-items-center">
+                                <span>Duration</span>
+                                <span><?= $event['duration']; ?> Days</span>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center">
+                                <span>Date</span>
+                                <span><?= $event['date']; ?></span>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center">
+                                <span>Price per person</span>
+                                <a href="#" class="price-btn"><?= $event['prix']; ?> Dt</a>
+                            </li>
+                        </ul>
+                        <a href="addReservation.php?eventId=<?= $event['id']; ?>&eventName=<?= urlencode($event['nom']); ?>&eventDesc=<?= urlencode($event['description']); ?>" 
+                           class="btn btn-primary mt-2 reserve-button">
+                            Reserve Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </section>
 
 
+	
+
+    </div>
 </div>
+
+	
+</section>
+<div class="pagination-container">
+    <nav>
+        <ul class="pagination">
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                    <a class="page-link" href="?page=<?= $i; ?>&search=<?= urlencode($_GET['search'] ?? ''); ?>&sort=<?= $_GET['sort'] ?? 'date'; ?>&order=<?= $_GET['order'] ?? 'ASC'; ?>">
+                        <?= $i; ?>
+                    </a>
+                </li>
+            <?php endfor; ?>
+        </ul>
+    </nav>
+</div>
+
 
 
 			<!-- End home-about Area -->
@@ -343,7 +447,34 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 				</div>
 			</footer>
 			<!-- End footer Area -->	
+<script>
+	function filterEvents() {
+    const query = document.getElementById("searchBar").value.toLowerCase();
+    const events = document.querySelectorAll(".single-destinations");
+    events.forEach(event => {
+        const eventName = event.querySelector("h4").textContent.toLowerCase();
+        const eventLocation = event.querySelector("p").textContent.toLowerCase();
+        event.style.display = eventName.includes(query) || eventLocation.includes(query) ? "" : "none";
+    });
+}
 
+</script>
+<script>
+	function sortEvents() {
+    const sortOption = document.getElementById("sortOptions").value;
+    const eventsContainer = document.querySelector(".row");
+    const events = Array.from(eventsContainer.children);
+
+    events.sort((a, b) => {
+        const aValue = a.querySelector(`.details ul li:contains(${sortOption})`).textContent.split(" ").pop();
+        const bValue = b.querySelector(`.details ul li:contains(${sortOption})`).textContent.split(" ").pop();
+        return sortOption === "price" || sortOption === "duration" ? aValue - bValue : new Date(aValue) - new Date(bValue);
+    });
+
+    events.forEach(event => eventsContainer.appendChild(event));
+}
+
+</script>
 			<script src="js/vendor/jquery-2.2.4.min.js"></script>
 			<script src="js/popper.min.js"></script>
 			<script src="js/vendor/bootstrap.min.js"></script>			

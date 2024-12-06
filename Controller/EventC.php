@@ -114,6 +114,70 @@ class EventC
         $query->execute();
         return $query->fetch(PDO::FETCH_ASSOC);
     }
+    public function getEventsWithPaginationAndSorting($offset, $limit, $sortColumn, $sortOrder)
+    {
+        // Validate input to prevent SQL injection
+        $allowedColumns = ['date', 'nom', 'prix'];
+        $allowedOrders = ['ASC', 'DESC'];
+        
+        if (!in_array($sortColumn, $allowedColumns)) {
+            $sortColumn = 'date';
+        }
+        if (!in_array($sortOrder, $allowedOrders)) {
+            $sortOrder = 'ASC';
+        }
+    
+        $sql = "SELECT * FROM events ORDER BY $sortColumn $sortOrder LIMIT :offset, :limit";
+        $db = Config::getConnexion();
+        try {
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            die('Error:' . $e->getMessage());
+        }
+    }
+    public function searchAndSortEvents($offset, $limit, $search, $sortColumn, $sortOrder)
+{
+    // Validate input
+    $allowedColumns = ['date', 'nom', 'prix'];
+    $allowedOrders = ['ASC', 'DESC'];
+
+    if (!in_array($sortColumn, $allowedColumns)) {
+        $sortColumn = 'date';
+    }
+    if (!in_array($sortOrder, $allowedOrders)) {
+        $sortOrder = 'ASC';
+    }
+
+    $db = Config::getConnexion();
+    try {
+        $sql = "SELECT * FROM events WHERE nom LIKE :search OR prix LIKE :search ORDER BY $sortColumn $sortOrder LIMIT :offset, :limit";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        die('Error:' . $e->getMessage());
+    }
+}
+public function countEvents($search)
+{
+    $db = Config::getConnexion();
+    try {
+        $sql = "SELECT COUNT(*) AS count FROM events WHERE nom LIKE :search OR prix LIKE :search";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+    } catch (Exception $e) {
+        die('Error:' . $e->getMessage());
+    }
+}
 
 
 }

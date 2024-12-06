@@ -4489,3 +4489,325 @@ body.mobile-nav-active #mobile-nav-toggle {
 .footer-text a, .footer-text i {
   color: #f8b600;
 }
+.pagination-container {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically within the container */
+  position: relative;
+  margin-top: 20px; /* Adds space above pagination */
+  width: 100%; /* Ensures the container spans the full width of the page */
+}
+
+.pagination {
+  margin: 0; /* Removes default margin */
+  padding: 0; /* Removes default padding */
+  list-style: none; /* Removes default bullet points */
+}
+
+.pagination .page-item {
+  display: inline-block;
+  margin: 0 5px; /* Adds spacing between pagination items */
+}
+
+.pagination .page-link {
+  color: #007bff;
+  text-decoration: none;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.pagination .page-link:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+.search-sort-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.search-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+}
+
+.input-group .form-control {
+  border-radius: 5px 0 0 5px;
+}
+
+.input-group .btn {
+  border-radius: 0 5px 5px 0;
+}
+
+.sort-dropdown {
+  margin-top: 10px;
+}
+
+.dropdown-menu {
+  width: 200px;
+}/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Event Grid */
+.event-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* Card Styles */
+.single-destination.card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+.single-destination.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Styles */
+.thumb.card-image img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-bottom: 2px solid #eee;
+}
+
+/* Content Styles */
+.details.card-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.event-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.event-location {
+    font-size: 15px;
+    color: #777;
+    margin-bottom: 20px;
+}
+
+.package-list {
+    font-size: 14px;
+    margin-bottom: 20px;
+    list-style: none;
+    padding: 0;
+}
+
+.package-list li {
+    margin: 8px 0;
+    color: #555;
+}
+
+/* Price Button */
+.price-btn {
+    font-weight: bold;
+    background-color: #ff9800;
+    color: #fff;
+    border-radius: 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+}
+
+.price-btn:hover {
+    background-color: #e68900;
+}
+
+/* Reserve Button */
+.reserve-button {
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+.reserve-button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .col-lg-4 {
+        max-width: 45%;
+    }
+}
+
+@media (max-width: 768px) {
+    .col-md-6 {
+        max-width: 100%;
+    }
+
+    .single-destination.card {
+        width: 100%;
+    }
+}
+/* General Styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Event Grid */
+.event-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* Card Styles */
+.single-destination.card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+.single-destination.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Styles */
+.thumb.card-image img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 2px solid #eee;
+}
+
+/* Content Styles */
+.details.card-content {
+  padding: 20px;
+  text-align: center;
+}
+
+.event-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.event-location {
+  font-size: 15px;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+.package-list {
+  font-size: 14px;
+  margin-bottom: 20px;
+  list-style: none;
+  padding: 0;
+}
+
+.package-list li {
+  margin: 8px 0;
+  color: #555;
+}
+
+/* Price Button */
+.price-btn {
+  font-weight: bold;
+  background-color: #ff9800;
+  color: #fff;
+  border-radius: 5px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.price-btn:hover {
+  background-color: #e68900;
+}
+
+/* Reserve Button */
+.reserve-button {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.reserve-button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .col-lg-4 {
+      max-width: 45%;
+  }
+}
+
+@media (max-width: 768px) {
+  .col-md-6 {
+      max-width: 100%;
+  }
+
+  .single-destination.card {
+      width: 100%;
+  }
+}

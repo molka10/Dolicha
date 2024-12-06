@@ -1,57 +1,66 @@
 <?php
-include '../Controller/EventC.php'; // Inclure le fichier contenant la classe HotelC
-$eventC = new EventC(); // Créer une instance de HotelC
+include '../Controller/ReservationC.php';
 
+$ReservationC = new ReservationC();
 $error = "";
 
+// Check if the form is submitted
 if (
-    isset($_POST["nom"]) &&
-    isset($_POST["duration"]) &&
-    isset($_POST["date"]) &&
-    isset($_POST["lieu"]) &&
-    isset($_POST["description"]) &&
-    isset($_POST["prix"]) &&
-    isset($_FILES["image"])
+    isset($_POST["id"]) &&
+    isset($_POST["name"]) &&
+    isset($_POST["email"])
 ) {
     if (
-        !empty($_POST['nom']) &&
-        !empty($_POST["duration"]) &&
-        !empty($_POST["date"]) &&
-        !empty($_POST["lieu"]) &&
-        !empty($_POST["description"]) &&
-        !empty($_POST["prix"]) &&
-        $_FILES["image"]["size"] != 0
+        !empty($_POST["id"]) &&
+        !empty($_POST["name"]) &&
+        !empty($_POST["email"])
     ) {
-        // Renommer l'image avant de l'enregistrer dans la base de données
-        $original_name = $_FILES["image"]["name"];
-        $imageName = uniqid() . time() . "." . pathinfo($original_name, PATHINFO_EXTENSION);
-        move_uploaded_file($_FILES["image"]["tmp_name"], "./images/uploads/" . $imageName);
+        // Get form values
+        $id = $_POST['id'];
+        $name = $_POST["name"];
+        $email = $_POST["email"];
 
-        // Créer une instance de la classe Hotel avec les données fournies
-        $event = new Event(
-            null, // Laissez null pour que l'ID soit auto-incrémenté
-            $_POST['nom'],
-            $_POST['duration'],
-            $_POST['date'],
-            $_POST['lieu'],
-            $_POST['description'],
-            $_POST['prix'],
-            $imageName // Utilisez le nom de l'image nouvellement téléchargée
-        );
-
-        // Ajouter l'hotel
-        $eventC->ajouterEvent($event);
-
-        header('Location: ./dashboard.php');
-        exit;
+        // Fetch existing reservation details
+        $currentReser = $ReservationC->getReservationById($id);
+        if (!$currentReser) {
+            $error = "Reservation not found.";
+        } else {
+            // Update the reservation
+            $success = $ReservationC->updateReservation($id,$name, $email);
+            if ($success) {
+                // Redirect to dashboard
+                header('Location:dashboardResr.php');
+                exit;
+            } else {
+                $error = "Failed to update the reservation.";
+            }
+        }
     } else {
-        $error = "Tous les champs doivent être remplis";
+        $error = "All fields must be filled out.";
     }
+    header('Location:dashboardResr.php');
+
+}
+
+// Retrieve the reservation to update (only if ID is provided in URL)
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $Reservation = $ReservationC->getReservationById($id);
+    if (!$Reservation) {
+        echo "Reservation not found.";
+        exit;
+    }
+} else {
+    echo "Reservation ID not specified.";
+    exit;
 }
 ?>
+<!-- update.php -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Connect Plus</title>
@@ -278,7 +287,7 @@ if (
               </a>
               <a class="nav-link" href="addEvent.php">
                 <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-                <span class="menu-title">Ajouter Event</span>
+                <span class="menu-title">Modifier Event</span>
               </a>
             
             <li class="nav-item">
@@ -350,104 +359,68 @@ if (
     </div>
 
     <!-- Ajouter un Event Form -->
-    <div class="row">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="title">Ajouter un Event</h5>
-      </div>
-      <div class="card-body">
-        <button type="button" class="btn btn-primary btn-round">
-          <a href="../examples/dashboard.php" style="color: white;">Retour à la liste</a>
-        </button>
-        <form action="" method="POST" name="myForm" enctype="multipart/form-data" onsubmit="return validateForm()">
-          <div class="row">
-            <div class="col-md-4 px-1">
-              <div class="form-group">
-                <label>Nom</label>
-                <input type="text" name="nom" class="form-control" placeholder="nom">
-                <div class="error-message" id="nomError"></div>
+    <div class="content">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="title">Update Reservation</h5>
+        </div>
+        <div class="card-body">
+          <!-- Back to the dashboard -->
+          <button type="button" class="btn btn-primary btn-round">
+            <a href="../examples/dashboard.php" style="color: white;">Back to list</a>
+          </button>
+
+          <!-- Form for updating reservation -->
+          <form method="POST" name="myForm" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <!-- Hidden field for reservation ID -->
+            <input type="hidden" name="id" value="<?php echo $Reservation['id']; ?>">
+
+            <div class="row">
+              <div class="col-md-4 px-1">
+                <div class="form-group">
+                  <label>Nom</label>
+                  <input
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    value="<?php echo $Reservation['name']; ?>"
+                    placeholder="Name"
+                    required
+                  />
+                </div>
               </div>
             </div>
-            <div class="col-md-4 px-1">
-              <div class="form-group">
-                <label>Duration</label>
-                <input type="text" name="duration" class="form-control" placeholder="duration">
-                <div class="error-message" id="durationError"></div>
+
+            <div class="row">
+              <div class="col-md-4 px-1">
+                <div class="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    class="form-control"
+                    value="<?php echo $Reservation['email']; ?>"
+                    placeholder="Email"
+                    required
+                  />
+                </div>
               </div>
             </div>
-            <div class="col-md-4 pl-1">
-              <div class="form-group">
-                <label>Date</label>
-                <input type="date" name="date" class="form-control" placeholder="date">
-                <div class="error-message" id="dateError"></div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-4 px-1">
-              <div class="form-group">
-                <label>Lieu</label>
-                <input type="text" name="lieu" class="form-control" placeholder="lieu">
-                <div class="error-message" id="lieuError"></div>
-              </div>
-            </div>
-            <div class="col-md-4 pl-1">
-              <div class="form-group">
-                <label>Description</label>
-                <input type="text" name="description" class="form-control" placeholder="description">
-                <div class="error-message" id="descriptionError"></div>
-              </div>
-            </div>
-            <div class="col-md-4 pl-1">
-              <div class="form-group">
-                <label>Prix</label>
-                <input type="text" name="prix" class="form-control" placeholder="prix">
-                <div class="error-message" id="prixError"></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 pl-1">
-            <div class="form-group">
-              <label>Image</label>
-              <input type="file" name="image" class="form-control" onchange="previewImage(event)">
-              <div class="img-container" style="margin-top: 10px; text-align: center;">
-                <img id="preview" src="./images/default_profile.jpg" alt="Profile Picture" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
-              </div>
-              <div class="error-message" id="imageError"></div>
-            </div>
-          </div>
-          <!-- Ajouter Button -->
-          <div class="form-group text-center" style="margin-top: 20px;">
-            <button type="submit" class="btn btn-success btn-round">Ajouter</button>
-          </div>
-        </form>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-round">Update Reservation</button>
+          </form>
+          <!-- End Form -->
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-              
-             
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
     <!-- End of Ajouter un Event Form -->
-    <script>
-    function previewImage(event) {
-      const preview = document.getElementById('preview');
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          preview.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  </script>
+    
   </div>
 </div>
           <footer class="footer">
@@ -466,52 +439,38 @@ if (
     </div>
     <script>
     function validateForm() {
-      let isValid = true;
+    let isValid = true;
 
-      // Clear all error messages
-      document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
+    // Clear all error messages
+    document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
 
-      // Get form fields
-      const nom = document.forms["myForm"]["nom"].value.trim();
-      const duration = document.forms["myForm"]["duration"].value.trim();
-      const date = document.forms["myForm"]["date"].value.trim();
-      const lieu = document.forms["myForm"]["lieu"].value.trim();
-      const description = document.forms["myForm"]["description"].value.trim();
-      const prix = document.forms["myForm"]["prix"].value.trim();
-      const image = document.forms["myForm"]["image"].files[0];
+    // Get form fields
+    const name = document.forms["myForm"]["name"].value.trim();
+    const email = document.forms["myForm"]["email"].value.trim();
 
-      // Validation rules
-      if (nom === "") {
-        document.getElementById('nomError').textContent = "Le champ Nom est requis.";
+    // Validation rules
+    if (name === "") {
+        document.getElementById('nameError').textContent = "Le champ Nom est requis.";
         isValid = false;
-      }
-      if (duration === "") {
-        document.getElementById('durationError').textContent = "Le champ Duration est requis.";
-        isValid = false;
-      }
-      if (date === "") {
-        document.getElementById('dateError').textContent = "Le champ Date est requis.";
-        isValid = false;
-      }
-      if (lieu === "") {
-        document.getElementById('lieuError').textContent = "Le champ Lieu est requis.";
-        isValid = false;
-      }
-      if (description === "") {
-        document.getElementById('descriptionError').textContent = "Le champ Description est requis.";
-        isValid = false;
-      }
-      if (prix === "" || isNaN(prix) || parseFloat(prix) <= 0) {
-        document.getElementById('prixError').textContent = "Entrez un prix valide.";
-        isValid = false;
-      }
-      if (!image) {
-        document.getElementById('imageError').textContent = "Veuillez ajouter une image.";
-        isValid = false;
-      }
-
-      return isValid;
     }
+
+    if (email === "") {
+        document.getElementById('emailError').textContent = "Le champ Email est requis.";
+        isValid = false;
+    } else if (!validateEmail(email)) {
+        document.getElementById('emailError').textContent = "Veuillez entrer un email valide.";
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+// Helper function to validate email format
+function validateEmail(email) {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
+}
+
 
     function previewImage(event) {
       const preview = document.getElementById('preview');

@@ -1,57 +1,40 @@
 <?php
-include '../Controller/EventC.php'; // Inclure le fichier contenant la classe HotelC
-$eventC = new EventC(); // Créer une instance de HotelC
+// Include the Reservation controller
+include '../controller/ReservationC.php';
+$c = new ReservationC();
+$tab = $c->listReservations();
 
-$error = "";
+// Check if an image file was uploaded (optional for reservation image)
+if (isset($_FILES['image'])) {
+    $errors = array();
+    $file_name = $_FILES['image']['name'];
+    $file_size = $_FILES['image']['size'];
+    $file_tmp = $_FILES['image']['tmp_name'];
+    $file_type = $_FILES['image']['type'];
+    $file_ext = strtolower(end(explode('.', $_FILES['image']['name'])));
 
-if (
-    isset($_POST["nom"]) &&
-    isset($_POST["duration"]) &&
-    isset($_POST["date"]) &&
-    isset($_POST["lieu"]) &&
-    isset($_POST["description"]) &&
-    isset($_POST["prix"]) &&
-    isset($_FILES["image"])
-) {
-    if (
-        !empty($_POST['nom']) &&
-        !empty($_POST["duration"]) &&
-        !empty($_POST["date"]) &&
-        !empty($_POST["lieu"]) &&
-        !empty($_POST["description"]) &&
-        !empty($_POST["prix"]) &&
-        $_FILES["image"]["size"] != 0
-    ) {
-        // Renommer l'image avant de l'enregistrer dans la base de données
-        $original_name = $_FILES["image"]["name"];
-        $imageName = uniqid() . time() . "." . pathinfo($original_name, PATHINFO_EXTENSION);
-        move_uploaded_file($_FILES["image"]["tmp_name"], "./images/uploads/" . $imageName);
+    $extensions = array("jpeg", "jpg", "png");
 
-        // Créer une instance de la classe Hotel avec les données fournies
-        $event = new Event(
-            null, // Laissez null pour que l'ID soit auto-incrémenté
-            $_POST['nom'],
-            $_POST['duration'],
-            $_POST['date'],
-            $_POST['lieu'],
-            $_POST['description'],
-            $_POST['prix'],
-            $imageName // Utilisez le nom de l'image nouvellement téléchargée
-        );
+    if (in_array($file_ext, $extensions) === false) {
+        $errors[] = "Extension not allowed, please choose a JPEG or PNG file.";
+    }
 
-        // Ajouter l'hotel
-        $eventC->ajouterEvent($event);
+    if ($file_size > 2097152) {
+        $errors[] = 'File size must be exactly 2 MB';
+    }
 
-        header('Location: ./dashboard.php');
-        exit;
+    if (empty($errors) == true) {
+        move_uploaded_file($file_tmp, "../assets/img/" . $file_name);
+        echo "Success";
     } else {
-        $error = "Tous les champs doivent être remplis";
+        print_r($errors);
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Connect Plus</title>
@@ -128,7 +111,7 @@ if (
             <li class="nav-item nav-profile dropdown">
               <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                 <div class="nav-profile-img">
-                  <img src="../assets/images/faces/face28.png" alt="image">
+                  <img src="assets/images/faces/face28.png" alt="image">
                 </div>
                 <div class="nav-profile-text">
                   <p class="mb-1 text-black">Henry Klein</p>
@@ -136,7 +119,7 @@ if (
               </a>
               <div class="dropdown-menu navbar-dropdown dropdown-menu-right p-0 border-0 font-size-sm" aria-labelledby="profileDropdown" data-x-placement="bottom-end">
                 <div class="p-3 text-center bg-primary">
-                  <img class="img-avatar img-avatar48 img-avatar-thumb" src="assets/images/faces/face28.png" alt="">
+                  <img class="img-avatar img-avatar48 img-avatar-thumb" src="../assets/images/faces/face28.png" alt="">
                 </div>
                 <div class="p-2">
                   <h5 class="dropdown-header text-uppercase pl-2 text-dark">User Options</h5>
@@ -181,7 +164,7 @@ if (
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
-                    <img src="assets/images/faces/face4.jpg" alt="image" class="profile-pic">
+                    <img src="../assets/images/faces/face4.jpg" alt="image" class="profile-pic">
                   </div>
                   <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
                     <h6 class="preview-subject ellipsis mb-1 font-weight-normal">Mark send you a message</h6>
@@ -191,7 +174,7 @@ if (
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
-                    <img src="assets/images/faces/face2.jpg" alt="image" class="profile-pic">
+                    <img src="../assets/images/faces/face2.jpg" alt="image" class="profile-pic">
                   </div>
                   <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
                     <h6 class="preview-subject ellipsis mb-1 font-weight-normal">Cregh send you a message</h6>
@@ -201,7 +184,7 @@ if (
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
-                    <img src="assets/images/faces/face3.jpg" alt="image" class="profile-pic">
+                    <img src="../assets/images/faces/face3.jpg" alt="image" class="profile-pic">
                   </div>
                   <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
                     <h6 class="preview-subject ellipsis mb-1 font-weight-normal">Profile picture updated</h6>
@@ -281,6 +264,7 @@ if (
                 <span class="menu-title">Ajouter Event</span>
               </a>
             
+            
             <li class="nav-item">
               <a class="nav-link" href="pages/forms/basic_elements.html">
                 <span class="icon-bg"><i class="mdi mdi-format-list-bulleted menu-icon"></i></span>
@@ -337,118 +321,63 @@ if (
         <!-- partial -->
         <div class="main-panel">
         <div class="main-panel">
-  <div class="content-wrapper">
-    <div class="row" id="proBanner">
-      <div class="col-12">
-        <span class="d-flex align-items-center purchase-popup">
-          <p>Like what you see? Check out our premium version for more.</p>
-          <a href="https://github.com/BootstrapDash/ConnectPlusAdmin-Free-Bootstrap-Admin-Template" target="_blank" class="btn ml-auto download-button">Download Free Version</a>
-          <a href="http://www.bootstrapdash.com/demo/connect-plus/jquery/template/" target="_blank" class="btn purchase-button">Upgrade To Pro</a>
-          <i class="mdi mdi-close" id="bannerClose"></i>
-        </span>
-      </div>
+  <!-- Begin Event List -->
+  <div class="panel-header panel-header-lg">
+    <div class="canvas" id="bigDashboardChart"></div>
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <h5 class="card-category">Reservation List</h5>
+                                <th class="text-center">ID</th>
+                                <th>Event ID</th>
+                                <th>Nom de l'Event</th>
+                                <th>Customer Name</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- PHP Loop to display reservations -->
+                            <?php foreach ($tab as $reservation) { ?>
+                                <tr>
+                                    <td class="text-center"><?= $reservation['id']; ?></td>
+                                    <td><?= $reservation['eventId']; ?></td>
+                                    <td><?= $reservation['eventName']; ?></td>
+                                    <td><?= $reservation['name']; ?></td>
+                                    <td><?= $reservation['email']; ?></td>
+                                    <td>
+                                        <a href="../view/updateReservation.php?id=<?= $reservation['id']; ?>">Modify</a>
+                                        <a href="../view/deleteReservation.php?id=<?= $reservation['id']; ?>">Delete</a>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                            <!-- End of PHP Loop -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- Ajouter un Event Form -->
-    <div class="row">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="title">Ajouter un Event</h5>
-      </div>
-      <div class="card-body">
-        <button type="button" class="btn btn-primary btn-round">
-          <a href="../examples/dashboard.php" style="color: white;">Retour à la liste</a>
-        </button>
-        <form action="" method="POST" name="myForm" enctype="multipart/form-data" onsubmit="return validateForm()">
-          <div class="row">
-            <div class="col-md-4 px-1">
-              <div class="form-group">
-                <label>Nom</label>
-                <input type="text" name="nom" class="form-control" placeholder="nom">
-                <div class="error-message" id="nomError"></div>
-              </div>
-            </div>
-            <div class="col-md-4 px-1">
-              <div class="form-group">
-                <label>Duration</label>
-                <input type="text" name="duration" class="form-control" placeholder="duration">
-                <div class="error-message" id="durationError"></div>
-              </div>
-            </div>
-            <div class="col-md-4 pl-1">
-              <div class="form-group">
-                <label>Date</label>
-                <input type="date" name="date" class="form-control" placeholder="date">
-                <div class="error-message" id="dateError"></div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-4 px-1">
-              <div class="form-group">
-                <label>Lieu</label>
-                <input type="text" name="lieu" class="form-control" placeholder="lieu">
-                <div class="error-message" id="lieuError"></div>
-              </div>
-            </div>
-            <div class="col-md-4 pl-1">
-              <div class="form-group">
-                <label>Description</label>
-                <input type="text" name="description" class="form-control" placeholder="description">
-                <div class="error-message" id="descriptionError"></div>
-              </div>
-            </div>
-            <div class="col-md-4 pl-1">
-              <div class="form-group">
-                <label>Prix</label>
-                <input type="text" name="prix" class="form-control" placeholder="prix">
-                <div class="error-message" id="prixError"></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 pl-1">
-            <div class="form-group">
-              <label>Image</label>
-              <input type="file" name="image" class="form-control" onchange="previewImage(event)">
-              <div class="img-container" style="margin-top: 10px; text-align: center;">
-                <img id="preview" src="./images/default_profile.jpg" alt="Profile Picture" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
-              </div>
-              <div class="error-message" id="imageError"></div>
-            </div>
-          </div>
-          <!-- Ajouter Button -->
-          <div class="form-group text-center" style="margin-top: 20px;">
-            <button type="submit" class="btn btn-success btn-round">Ajouter</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 </div>
 
-              
-             
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- End of Ajouter un Event Form -->
-    <script>
-    function previewImage(event) {
-      const preview = document.getElementById('preview');
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          preview.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  </script>
-  </div>
+          <script>
+  function showPreview(src) {
+    const modal = document.getElementById('imagePreviewModal');
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = src;
+    modal.style.display = 'flex';
+  }
+
+  function closePreview() {
+    const modal = document.getElementById('imagePreviewModal');
+    modal.style.display = 'none';
+  }
+</script>
+
 </div>
           <footer class="footer">
             <div class="footer-inner-wraper">
@@ -464,67 +393,6 @@ if (
       </div>
       <!-- page-body-wrapper ends -->
     </div>
-    <script>
-    function validateForm() {
-      let isValid = true;
-
-      // Clear all error messages
-      document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
-
-      // Get form fields
-      const nom = document.forms["myForm"]["nom"].value.trim();
-      const duration = document.forms["myForm"]["duration"].value.trim();
-      const date = document.forms["myForm"]["date"].value.trim();
-      const lieu = document.forms["myForm"]["lieu"].value.trim();
-      const description = document.forms["myForm"]["description"].value.trim();
-      const prix = document.forms["myForm"]["prix"].value.trim();
-      const image = document.forms["myForm"]["image"].files[0];
-
-      // Validation rules
-      if (nom === "") {
-        document.getElementById('nomError').textContent = "Le champ Nom est requis.";
-        isValid = false;
-      }
-      if (duration === "") {
-        document.getElementById('durationError').textContent = "Le champ Duration est requis.";
-        isValid = false;
-      }
-      if (date === "") {
-        document.getElementById('dateError').textContent = "Le champ Date est requis.";
-        isValid = false;
-      }
-      if (lieu === "") {
-        document.getElementById('lieuError').textContent = "Le champ Lieu est requis.";
-        isValid = false;
-      }
-      if (description === "") {
-        document.getElementById('descriptionError').textContent = "Le champ Description est requis.";
-        isValid = false;
-      }
-      if (prix === "" || isNaN(prix) || parseFloat(prix) <= 0) {
-        document.getElementById('prixError').textContent = "Entrez un prix valide.";
-        isValid = false;
-      }
-      if (!image) {
-        document.getElementById('imageError').textContent = "Veuillez ajouter une image.";
-        isValid = false;
-      }
-
-      return isValid;
-    }
-
-    function previewImage(event) {
-      const preview = document.getElementById('preview');
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          preview.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  </script>
     <!-- container-scroller -->
     <!-- plugins:js -->
     <script src="../assets/vendors/js/vendor.bundle.base.js"></script>
