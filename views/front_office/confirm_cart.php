@@ -18,17 +18,9 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 
     // Check if the user already has an existing cart
     $existingCartId = $cartController->getExistingCartId($Iduser);
-
-    /*if ($existingCartId) {
-        // If a cart exists, update the quantities of products in the cart
-        foreach ($_SESSION['cart'] as $Idproduit => $quantity) {
-            // Update the quantity of each product in the existing cart
-            $cartController->updateProductQuantity($existingCartId, $Idproduit, $quantity);
-        }
-    }*/ //else {
         // If no cart exists, create a new cart
         // Insert new cart into the 'panier' table
-        $panierId = $cartController->createPanier($Iduser, $total, 0); // 0 means the cart is not confirmed yet
+        $panierId = $cartController->createPanier($Iduser, $total, 1); // 0 means the cart is not confirmed yet
 
         // Add products to the 'panier_items' table (saving `idproduit` and `quantity`)
         foreach ($_SESSION['cart'] as $Idproduit => $quantity) {

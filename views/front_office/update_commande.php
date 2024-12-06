@@ -236,32 +236,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Update Commande</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Update Commande</h1>
-        <form method="POST">
-            <div class="form-group">
-                <label for="iduser">ID User</label>
-                <input type="text" class="form-control" id="iduser" name="iduser" value="<?php echo htmlspecialchars($commande->getIduser()); ?>" readonly>
-            </div>
-            <div class="form-group">
-                <label for="idpanier">ID Panier</label>
-                <input type="text" class="form-control" id="idpanier" name="idpanier" value="<?php echo htmlspecialchars($commande->getIdpanier()); ?>" readonly>
-            </div>
-            <div class="form-group">
-                <label for="date">Date</label>
-                <input type="date" class="form-control" id="date" name="date" value="<?php echo htmlspecialchars($commande->getDate()->format('Y-m-d')); ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="status">Status</label>
-                <select class="form-control" id="status" name="status" required>
-                    <option value="0" <?php echo $commande->getStatus() == 0 ? 'selected' : ''; ?>>Not Confirmed</option>
-                    <option value="1" <?php echo $commande->getStatus() == 1 ? 'selected' : ''; ?>>Confirmed</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Update</button>
-        </form>
-    </div>
+<div class="container">
+    <h1>Update Commande</h1>
+    <form method="POST" onsubmit="return validateDate();">
+        <div class="form-group">
+            <label for="iduser">ID User</label>
+            <input type="text" class="form-control" id="iduser" name="iduser" value="<?php echo htmlspecialchars($commande->getIduser()); ?>" >
+        </div>
+        <div class="form-group">
+            <label for="idpanier">ID Panier</label>
+            <input type="text" class="form-control" id="idpanier" name="idpanier" value="<?php echo htmlspecialchars($commande->getIdpanier()); ?>" >
+        </div>
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" class="form-control" id="date" name="date" value="<?php echo htmlspecialchars($commande->getDate()->format('Y-m-d')); ?>"  max="<?php echo date('Y-m-d'); ?>">
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status" required>
+                <option value="0" <?php echo $commande->getStatus() == 0 ? 'selected' : ''; ?>>Not Confirmed</option>
+                <option value="1" <?php echo $commande->getStatus() == 1 ? 'selected' : ''; ?>>Confirmed</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
 
+<script src="js/vendor/jquery-2.2.4.min.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Store original values for ID fields
+        const idUser = document.getElementById('iduser');
+        const idPanier = document.getElementById('idpanier');
+        const originalIdUserValue = idUser.value;
+        const originalIdPanierValue = idPanier.value;
+
+        // Prevent modification of ID User
+        idUser.addEventListener('input', function() {
+            idUser.value = originalIdUserValue; // Revert to original if changed
+        });
+
+        // Prevent modification of ID Panier
+        idPanier.addEventListener('input', function() {
+            idPanier.value = originalIdPanierValue; // Revert to original if changed
+        });
+    });
+
+    function validateDate() {
+        const dateInput = document.getElementById('date');
+        const selectedDate = new Date(dateInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set time to midnight for comparison
+
+        if (selectedDate < today) {
+            alert('Please select a date that is today or in the future.');
+            dateInput.value = ''; // Clear the invalid input
+            dateInput.focus(); // Set focus back to the date input
+            return false; // Prevent form submission
+        }
+        return true; // Allow form submission
+    }
+</script>
     <script src="js/vendor/jquery-2.2.4.min.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
 </body>

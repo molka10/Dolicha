@@ -114,39 +114,50 @@ $products = $productController->getAllProducts();
     </section>
 
     <section class="product-section section-gap">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-12">
-                    <h2 class="section-title">Featured Products</h2>
-                    <div class="row">
-                        <?php
-                        if (!empty($products)) {
-                            foreach ($products as $product) {
-                                echo '
-                                <div class="col-lg-4 col-md-6 col-sm-12">
-                                    <div class="single-product">
-                                        <img src="img/product-placeholder.jpg" alt="' . htmlspecialchars($product->getNom()) . '" class="img-fluid">
-                                        <h3 class="product-name">' . htmlspecialchars($product->getNom()) . '</h3>
-                                        <p class="product-description">Experience the best of ' . htmlspecialchars($product->getNom()) . '!</p>
-                                        <span class="product-price">$' . htmlspecialchars($product->getPrix()) . '</span>
-                                        <form action="add_to_cart.php" method="post">
-                                            <input type="hidden" name="productId" value="' . htmlspecialchars($product->getIdproduit()) . '">
-                                            <input type="hidden" name="userId" value="1">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-primary">Add to Cart</button>
-                                        </form>
-                                    </div>
-                                </div>';
-                            }
-                        } else {
-                            echo '<p>No products found.</p>';
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-12">
+                <h2 class="section-title">Featured Products</h2>
+                <div class="row">
+                    <?php
+                    if (!empty($products)) {
+                        foreach ($products as $product) {
+                            echo '
+                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                <div class="single-product">
+                                    <img src="img/product-placeholder.jpg" alt="' . htmlspecialchars($product->getNom()) . '" class="img-fluid">
+                                    <h3 class="product-name">' . htmlspecialchars($product->getNom()) . '</h3>
+                                    <p class="product-description">Experience the best of ' . htmlspecialchars($product->getNom()) . '!</p>
+                                    <span class="product-price">$' . htmlspecialchars($product->getPrix()) . '</span>
+                                    <form action="add_to_cart.php" method="post" onsubmit="return validateQuantity(this);">
+                                        <input type="hidden" name="productId" value="' . htmlspecialchars($product->getIdproduit()) . '">
+                                        <input type="hidden" name="userId" value="1">
+                                        <input type="number" name="quantity" value="1" style="width: 60px;" >
+                                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                                    </form>
+                                </div>
+                            </div>';
                         }
-                        ?>
-                    </div>
+                    } else {
+                        echo '<p>No products found.</p>';
+                    }
+                    ?>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
+<script>
+function validateQuantity(form) {
+    const quantity = form.quantity.value;
+    if (quantity <= 0) {
+        alert('Please enter a valid quantity greater than zero.');
+        return false; // Prevent form submission
+    }
+    return true; // Allow form submission
+}
+</script>
 
     <footer class="footer-area section-gap">
         <!-- Your footer content -->

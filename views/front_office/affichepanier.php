@@ -190,36 +190,67 @@ $carts = $cartController->getAllPanier();
 
     <h1>Cart Management</h1>
 
-    <!-- Table to display the cart information -->
-    <table>
-        <thead>
+<!-- Table to display the cart information -->
+<table id="cartTable">
+    <thead>
+        <tr>
+            <th>ID Panier</th>
+            <th onclick="sortTable(1)">Total &#x25B2;&#x25BC;</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($carts as $cart): ?>
             <tr>
-                <th>ID Panier</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <td data-label="ID Panier"><?php echo htmlspecialchars($cart['Idpanier']); ?></td>
+                <td data-label="Total" class="total"><?php echo htmlspecialchars(number_format($cart['total'], 2)); ?> €</td>
+                <td data-label="Status">
+                    <?php echo htmlspecialchars($cart['status'] == 0 ? 'Not Confirmed' : 'Confirmed'); ?>
+                </td>
+                <td data-label="Actions" class="action-links">
+                    <a href="update_cart.php?id=<?php echo $cart['Idpanier']; ?>">Update</a>
+                    <a href="delete_cart.php?id=<?php echo $cart['Idpanier']; ?>" class="delete-link" onclick="return confirm('Are you sure you want to delete this cart?');">Delete</a>
+                    <a href="view_products.php?id=<?php echo $cart['Idpanier']; ?>">View Products</a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($carts as $cart): ?>
-                <tr>
-                    <td data-label="ID Panier"><?php echo htmlspecialchars($cart['Idpanier']); ?></td>
-                    <td data-label="Total"><?php echo htmlspecialchars(number_format($cart['total'], 2)); ?> €</td>
-                    <td data-label="Status">
-                        <?php
-                        // Define or format status as needed
-                        echo htmlspecialchars($cart['status'] == 0 ? 'Not Confirmed' : 'Confirmed');
-                        ?>
-                    </td>
-                    <td data-label="Actions" class="action-links">
-                        <a href="update_cart.php?id=<?php echo $cart['Idpanier']; ?>">Update</a>
-                        <a href="delete_cart.php?id=<?php echo $cart['Idpanier']; ?>" class="delete-link" onclick="return confirm('Are you sure you want to delete this cart?');">Delete</a>
-                        <a href="view_products.php?id=<?php echo $cart['Idpanier']; ?>" > View Products</a >
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<script>
+function sortTable(columnIndex) {
+    const table = document.getElementById("cartTable");
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+    const isAscending = table.getAttribute('data-sort-order') === 'asc';
+
+    rows.sort((a, b) => {
+        const aText = a.cells[columnIndex].textContent.replace(' €', '').replace(',', '.');
+        const bText = b.cells[columnIndex].textContent.replace(' €', '').replace(',', '.');
+
+        return isAscending ? aText - bText : bText - aText;
+    });
+
+    rows.forEach(row => tbody.appendChild(row)); // Reorder the rows in the table body
+    table.setAttribute('data-sort-order', isAscending ? 'desc' : 'asc'); // Toggle sort order
+}
+</script>
+
+<style>
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    cursor: pointer; /* Indicate that the column is clickable */
+}
+
+th:hover {
+    background-color: #f1f1f1; /* Highlight on hover */
+}
+</style>
     <footer  >
         <!-- Your footer content -->
     </footer>

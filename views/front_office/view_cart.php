@@ -3,10 +3,10 @@ session_start();
 require_once 'C:\xampp\htdocs\dolicha0.2\controller\productController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 
-/*if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
+if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
     echo '<p>Votre panier est vide.</p>';
     exit();
-}*/
+}
 
 $productController = new ProductController($pdo);
 $cart = $_SESSION['cart'];
