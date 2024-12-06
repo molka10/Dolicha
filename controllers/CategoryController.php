@@ -80,5 +80,18 @@ class CategoryController {
             return false;  // Return false in case of an error
         }
     }
+    public function getCategoryById($categoryId) {
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM category WHERE ID_Category = :categoryId");
+            $stmt->execute(['categoryId' => $categoryId]);
+            $category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $category ?: null;
+        } catch (PDOException $e) {
+            error_log("Error fetching category: " . $e->getMessage());
+            return null;
+        }
+    }
 }
+
 ?>

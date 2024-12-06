@@ -1,45 +1,42 @@
 <?php
+// Include necessary files
 include '../db.php';
 include '../controllers/ProductController.php';
+include '../controllers/CategoryController.php';
 
-$controller = new ProductController($pdo);
-$products = $controller->getAllProducts();  // Get all products using the controller
-$stmt = $pdo->query("SELECT * FROM product");  
-$tab = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Initialize controllers
+$productController = new ProductController($pdo);
+$categoryController = new CategoryController($pdo);
 
-if (!empty($tab)) {
-    // PHP Loop to display data
-    foreach ($tab as $product) {
-        ?>
-        <tr>
-            <td class="text-center"><?= $product['ID_Product']; ?></td>
-            <td><?= $product['Name']; ?></td>
-            <td><?= $product['Price']; ?></td>
-            <td><?= $product['Stock']; ?></td>
-            <td>
-                <?php 
-                // Fetch category name from the category table
-                $categoryStmt = $pdo->prepare("SELECT CategoryName FROM category WHERE ID_Category = :categoryId");
-                $categoryStmt->execute(['categoryId' => $product['ID_Category']]);
-                $category = $categoryStmt->fetch(PDO::FETCH_ASSOC);
-                echo $category ? $category['CategoryName'] : 'Unknown';
-                ?>
-            </td>
-            <td>
-                <a href="../view/edit_product.php?id=<?= $product['ID_Product']; ?>">Edit</a>
-                <a href="../view/delete_product.php?id=<?= $product['ID_Product']; ?>">Delete</a>
-            </td>
-        </tr>
-        <?php
-    }
-} else {
-    echo "<tr><td colspan='6'>No products found.</td></tr>";  // If no products are found
-}
+// Fetch sorting option (if any)
+$sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : null;
+
+// Fetch products with optional sorting
+$products = $productController->getAllProducts($sortBy);
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
+  <style>
+    /* CSS to increase the image size in the table */
+.product-image {
+  width: 200px; /* Set your desired width (larger than before) */
+  height: 200px; /* Set your desired height (larger than before) */
+  object-fit: cover; /* Ensures the image maintains its aspect ratio */
+  cursor: pointer;
+}
+
+/* Optional: If you want to show a larger image in the modal preview */
+#modalImage {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
+
+  </style>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -59,6 +56,7 @@ if (!empty($tab)) {
     <link rel="stylesheet" href="../assets/css/style.css">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="../assets/images/favicon.png" />
+
   </head>
   <body>
     <div class="container-scroller">
@@ -328,68 +326,104 @@ if (!empty($tab)) {
         <div class="main-panel">
         <div class="main-panel">            
             <!-- Begin Category List -->
-<div class="panel-header panel-header-lg">
-  <div class="canvas" id="bigDashboardChart"></div>
-</div><div class="content">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card">
-        <table class="table">
-          <thead>
-            <tr>
-              <h5 class="card-category">Product List</h5>
-              <th class="text-center">ID</th>
-              <th>Product Name</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Category</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- PHP Loop to display products -->
-            <?php foreach ($tab as $product) { ?>
-              <tr>
-                <td class="text-center"><?= $product['ID_Product']; ?></td>
-                <td><?= $product['Name']; ?></td>
-                <td><?= $product['Price']; ?></td>
-                <td><?= $product['Stock']; ?></td>
-                <td>
-                  <?php 
-                  // Get category name from the database
-                  $categoryStmt = $pdo->prepare("SELECT CategoryName FROM category WHERE ID_Category = :categoryId");
-                  $categoryStmt->execute(['categoryId' => $product['ID_Category']]);
-                  $category = $categoryStmt->fetch(PDO::FETCH_ASSOC);
-                  echo $category ? $category['CategoryName'] : 'Unknown';
-                  ?>
-                </td>
-                <td>
-                  <a href="../view/edit_product.php?id=<?= $product['ID_Product']; ?>">Edit</a>
-                  <a href="../view/delete_product.php?id=<?= $product['ID_Product']; ?>">Delete</a>
-                </td>
-              </tr>
-            <?php } ?>
-            <!-- End of PHP Loop -->
-          </tbody>
-        </table>
-      </div>
+            <div class="panel-header panel-header-lg">
+        <div class="canvas" id="bigDashboardChart"></div>
     </div>
-  </div>
-</div>
-<!-- End Product List -->
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-category">Product List</h5>
+                        <!-- Sorting Dropdown -->
+                        <select id="sort_by" onchange="sortProducts()">
+                            <option value="">Sort by</option>
+                            <option value="LastEdited">Last Edited</option>
+                            <option value="Stock">Stock</option>
+                            <option value="Price">Price</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ID</th>
+                                    <th>Product Name</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Category</th>
+                                    <th>Image</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($products)) { ?>
+                                    <?php foreach ($products as $product) { ?>
+                                        <tr>
+                                            <td class="text-center"><?= htmlspecialchars($product->getId()); ?></td>
+                                            <td><?= htmlspecialchars($product->getName()); ?></td>
+                                            <td><?= htmlspecialchars($product->getPrice()); ?> USD</td>
+                                            <td><?= htmlspecialchars($product->getStock()); ?></td>
+                                            <td>
+                                                <?php 
+                                                // Get category name
+                                                $category = $categoryController->getCategoryById($product->getIdCategory());
+                                                echo $category ? htmlspecialchars($category['CategoryName']) : 'Unknown';
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <?php 
+                                                // Display product image with preview functionality
+                                                if (!empty($product->getImage())) {
+                                                    echo "<img src='../uploads/" . htmlspecialchars($product->getImage()) . "' alt='" . htmlspecialchars($product->getName()) . "' class='product-image' onclick='showPreview(\"../uploads/" . htmlspecialchars($product->getImage()) . "\")' style='cursor: pointer;'>";
+                                                } else {
+                                                    echo "No image available";
+                                                }
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <a href="../view/edit_product.php?id=<?= htmlspecialchars($product->getId()); ?>">Edit</a> |
+                                                <a href="../view/delete_product.php?id=<?= htmlspecialchars($product->getId()); ?>" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                <?php } else { ?>
+                                    <tr>
+                                        <td colspan="7" class="text-center">No products found.</td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script>
-  // Function to show the image preview in a modal
-  function showPreview(src) {
-    const modal = document.getElementById('imagePreviewModal');
-    const modalImage = document.getElementById('modalImage');
-    modalImage.src = src;
-    modal.style.display = 'flex';
-  }
+    <!-- Modal for Image Preview -->
+    <div id="imagePreviewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0, 0, 0, 0.7); justify-content:center; align-items:center;">
+        <span onclick="closePreview()" style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer;">&times;</span>
+        <img id="modalImage" style="max-width:90%; max-height:90%; object-fit:contain;" src="" alt="Image Preview">
+    </div>
 
-  // Function to close the image preview modal
-  function closePreview() {
-    const modal = document.getElementById('imagePreviewModal');
-    modal.style.display = 'none';
-  }
-</script>
+    <script>
+        // Function to show the image preview in a modal
+        function showPreview(src) {
+            const modal = document.getElementById('imagePreviewModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = src;
+            modal.style.display = 'flex';
+        }
+
+        // Function to close the image preview modal
+        function closePreview() {
+            const modal = document.getElementById('imagePreviewModal');
+            modal.style.display = 'none';
+        }
+
+        // Function to handle product sorting
+        function sortProducts() {
+            const sortBy = document.getElementById('sort_by').value;
+            window.location.href = "?sort_by=" + sortBy;  // Refresh page with sorting option in the query string
+        }
+    </script>

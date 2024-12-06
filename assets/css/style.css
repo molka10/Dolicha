@@ -38,7 +38,19 @@
 /* === Import template variables === */
 /*-------------------------------------------------------------------*/
 /* === SCSS Compass Functions === */
+.product-image {
+  width: 200px; /* Set your desired width (larger than before) */
+  height: 200px; /* Set your desired height (larger than before) */
+  object-fit: cover; /* Ensures the image maintains its aspect ratio */
+  cursor: pointer;
+}
 
+/* Optional: If you want to show a larger image in the modal preview */
+#modalImage {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
 @-webkit-keyframes flash {
   0% {
     opacity: 1; }
@@ -13620,7 +13632,7 @@ dl {
         height: auto;
         line-height: 1;
         border-top: 0;
-        padding: 1.25rem 0; }
+        }
         .sidebar .nav .nav-item.nav-profile .nav-link .nav-profile-image {
           width: 44px;
           height: 44px; }

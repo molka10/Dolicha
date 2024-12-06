@@ -15,9 +15,21 @@ if (!$product) {
     die("Error: Product not found.");
 }
 
+// Check if there is an image to delete
+$imagePath = $product->getImage(); // Assuming 'getImage()' returns the file path of the product image
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Delete the product image file if it exists
+    if ($imagePath && file_exists($imagePath)) {
+        unlink($imagePath); // Delete the image file from the server
+    }
+
+    // Delete the product from the database
     $productController->deleteProduct($id);
-    header("Location: index_product.php"); // Redirect to the main page
+
+    // Redirect to the main product listing page
+    header("Location: index_product.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -31,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <p>Are you sure you want to delete the product "<?= htmlspecialchars($product->getName()) ?>"?</p>
     <form method="post">
         <button type="submit">Yes, Delete</button>
-        <a href="index.php">Cancel</a>
+        <a href="index_product.php">Cancel</a>
     </form>
 </body>
 </html>

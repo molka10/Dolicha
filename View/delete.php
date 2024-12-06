@@ -1,6 +1,6 @@
 <?php
-include '../../db.php';
-include '../../controllers/CategoryController.php';
+include '../db.php';
+include '../controllers/CategoryController.php';
 
 $controller = new CategoryController($pdo);
 

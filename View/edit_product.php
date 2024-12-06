@@ -17,19 +17,36 @@ if (!$product) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validate input values
-    $name = $_POST['name'];
+    $name = $_POST['product_name'];
     $price = $_POST['price'];
     $stock = $_POST['stock'];
-    $categoryId = $_POST['category'];
+    $categoryId = $_POST['category_id'];
+
+    // Handle image upload
+    $image = null;
+    if (isset($_FILES['productImage']) && $_FILES['productImage']['error'] == 0) {
+        // Define upload directory
+        $uploadDir = '../uploads/';
+        $imageName = basename($_FILES['productImage']['name']);
+        $uploadFile = $uploadDir . $imageName;
+
+        // Move uploaded file to the server directory
+        if (move_uploaded_file($_FILES['productImage']['tmp_name'], $uploadFile)) {
+            $image = $uploadFile; // Store the path to the uploaded image
+        } else {
+            die("Error uploading image.");
+        }
+    }
 
     // Update the product in the database
-    $productController->updateProduct($id, $name, $price, $stock, $categoryId);
+    $productController->updateProduct($id, $name, $price, $stock, $categoryId, $image);
 
     // Redirect to the product listing page
     header("Location: index_product.php");
     exit(); // Ensure script termination after redirect
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -391,43 +408,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="card-header">
             <h5>Update Product</h5>
         </div>
-        <form action="" method="POST" name="myForm" onsubmit="return validateForm()">
-            <!-- Hidden field for product ID -->
-            <input type="hidden" name="id" value="<?= htmlspecialchars($product->getId()) ?>">
+        <form action="" method="POST" name="myForm" onsubmit="return validateForm()" enctype="multipart/form-data">
+    <!-- Hidden field for product ID -->
+    <input type="hidden" name="id" value="<?= htmlspecialchars($product->getId()) ?>">
 
-            <div class="form-group">
-                <label for="product_name">Product Name:</label>
-                <input type="text" name="product_name" id="product_name" class="form-control" value="<?= htmlspecialchars($product->getName()) ?>" required>
-            </div>
+    <div class="form-group">
+        <label for="product_name">Product Name:</label>
+        <input type="text" name="product_name" id="product_name" class="form-control" value="<?= htmlspecialchars($product->getName()) ?>" required>
+    </div>
 
-            <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="number" name="price" id="price" class="form-control" value="<?= htmlspecialchars($product->getPrice()) ?>" required>
-            </div>
+    <div class="form-group">
+        <label for="price">Price:</label>
+        <input type="number" name="price" id="price" class="form-control" value="<?= htmlspecialchars($product->getPrice()) ?>" required>
+    </div>
 
-            <div class="form-group">
-                <label for="stock">Stock:</label>
-                <input type="number" name="stock" id="stock" class="form-control" value="<?= htmlspecialchars($product->getStock()) ?>" required>
-            </div>
+    <div class="form-group">
+        <label for="stock">Stock:</label>
+        <input type="number" name="stock" id="stock" class="form-control" value="<?= htmlspecialchars($product->getStock()) ?>" required>
+    </div>
 
-            <div class="form-group">
-                <label for="category_id">Category:</label>
-                <select name="category_id" id="category_id" class="form-control" required>
-                    <option value="">Select a Category</option>
-                    <?php
-                    // Fetch all categories and display them in the select dropdown
-                    $stmt = $pdo->query("SELECT * FROM category");
-                    while ($category = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        // Check if this category is the current product's category
-                        $selected = ($category['ID_Category'] == $product->getIdCategory()) ? 'selected' : '';
-                        echo "<option value='{$category['ID_Category']}' $selected>{$category['CategoryName']}</option>";
-                    }
-                    ?>
-                </select>
-            </div>
+    <div class="form-group">
+        <label for="category_id">Category:</label>
+        <select name="category_id" id="category_id" class="form-control" required>
+            <option value="">Select a Category</option>
+            <?php
+            // Fetch all categories and display them in the select dropdown
+            $stmt = $pdo->query("SELECT * FROM category");
+            while ($category = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                // Check if this category is the current product's category
+                $selected = ($category['ID_Category'] == $product->getIdCategory()) ? 'selected' : '';
+                echo "<option value='{$category['ID_Category']}' $selected>{$category['CategoryName']}</option>";
+            }
+            ?>
+        </select>
+    </div>
 
-            <button type="submit" class="btn">Update Product</button>
-        </form>
+    <!-- Product Image Upload -->
+    <div class="col-md-6 px-1">
+        <div class="form-group">
+            <label>Product Image</label>
+            <input type="file" name="productImage" class="form-control" accept="image/*">
+            <div class="error-message" id="productImageError"></div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn">Update Product</button>
+</form>
+
     </div>
 </div>
 

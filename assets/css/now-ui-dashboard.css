@@ -4767,9 +4767,11 @@ Created using IcoMoon - icomoon.io
 }
 
 .card-user .image {
-  height: 120px;
+  width: 200px; /* Set your desired width (larger than before) */
+  height: 200px; /* Set your desired height (larger than before) */
+  object-fit: cover; /* Ensures the image maintains its aspect ratio */
+  cursor: pointer;
 }
-
 .card-user .author {
   text-align: center;
   text-transform: none;
