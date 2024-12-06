@@ -10,7 +10,7 @@ class PanierController {
 
     public function getProductsByCartId($Idpanier) {
         $query = "
-            SELECT p.nom, pi.quantity 
+            SELECT p.nom, p.prix, pi.quantity 
             FROM panier_items pi
             JOIN produit p ON pi.Idproduit = p.Idproduit 
             WHERE pi.Idpanier = :Idpanier
@@ -21,10 +21,14 @@ class PanierController {
     }
 
 
-    public function insertOrder($userId, $cartId, $status = 1) {
-        global $pdo; // Use the PDO instance
-        $stmt = $pdo->prepare("INSERT INTO commande (iduser, Idpanier, date, status) VALUES (?, ?, NOW(), ?)");
-        return $stmt->execute([$userId, $cartId, $status]);
+    public function insertOrder($Iduser, $panierId, $nom_client, $status) {
+        $query = "INSERT INTO commande (nom_client, Idpanier, date, status) VALUES (:nom_client, :Idpanier, NOW(), :status)";
+        $stmt = $this->pdo->prepare($query);
+        return $stmt->execute([
+            ':nom_client' => $nom_client,
+            ':Idpanier' => $panierId,
+            ':status' => $status,
+        ]);
     }
 
     public function deletePanier($Idpanier) {

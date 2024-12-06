@@ -129,7 +129,7 @@ $products = $productController->getAllProducts();
                                     <h3 class="product-name">' . htmlspecialchars($product->getNom()) . '</h3>
                                     <p class="product-description">Experience the best of ' . htmlspecialchars($product->getNom()) . '!</p>
                                     <span class="product-price">$' . htmlspecialchars($product->getPrix()) . '</span>
-                                    <form action="add_to_cart.php" method="post" onsubmit="return validateQuantity(this);">
+                                    <form class="addToCartForm" action="add_to_cart.php" method="post" onsubmit="return validateQuantity(this);">
                                         <input type="hidden" name="productId" value="' . htmlspecialchars($product->getIdproduit()) . '">
                                         <input type="hidden" name="userId" value="1">
                                         <input type="number" name="quantity" value="1" style="width: 60px;" >
@@ -171,5 +171,42 @@ function validateQuantity(form) {
     <script src="js/jquery.nice-select.min.js"></script>
     <script src="js/jquery.sticky.js"></script>
     <script src="js/main.js"></script>
+    <script>
+// Validate quantity function remains the same
+function validateQuantity(form) {
+    const quantity = form.quantity.value;
+    if (quantity <= 0) {
+        alert('Please enter a valid quantity greater than zero.');
+        return false; // Prevent form submission
+    }
+    return true; // Allow form submission
+}
+
+// Add event listener for all forms with the class 'addToCartForm'
+document.querySelectorAll('.addToCartForm').forEach(form => {
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this); // Create FormData object
+
+        fetch('add_to_cart.php', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message); // Show success message
+            } else {
+                alert(data.message); // Show error message
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    });
+});
+</script>
 </body>
 </html>

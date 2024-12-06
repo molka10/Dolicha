@@ -35,7 +35,7 @@ class CommandeController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     public function deleteCommande($id) {
-        $stmt = $this->pdo->prepare("DELETE FROM commandes WHERE idcommande = :id");
+        $stmt = $this->pdo->prepare("DELETE FROM commande WHERE idcommande = :id");
         $stmt->bindParam(':id', $id);
         $stmt->execute();
     }

@@ -241,42 +241,80 @@ $commandes = $commandeController->getAllCommandes();
 
     <h1>Order Management</h1>
 
-    <!-- Table to display the order information -->
-    <table>
-        <thead>
+<!-- Search Bar -->
+<label for="search">Search by Nom Client:</label>
+<input type="text" id="search" onkeyup="filterTable()" placeholder="Type to search...">
+
+<!-- Table to display the order information -->
+<table id="orderTable">
+    <thead>
+        <tr>
+            <th>ID Commande</th>
+            <th>Nom Client</th>
+            <th>ID Panier</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($commandes as $commande): ?>
             <tr>
-                <th>ID Commande</th>
-                <th>ID User</th>
-                <th>ID Panier</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <td data-label="ID Commande"><?php echo htmlspecialchars($commande['idcommande']); ?></td>
+                <td data-label="Nom Client"><?php echo htmlspecialchars($commande['nom_client']); ?></td>
+                <td data-label="ID Panier"><?php echo htmlspecialchars($commande['Idpanier']); ?></td>
+                <td data-label="Date">
+                    <?php 
+                    // Format the date
+                    $date = new DateTime($commande['date']);
+                    echo htmlspecialchars($date->format('d/m/y')); // Output as d/m/y
+                    ?>
+                </td>
+                <td data-label="Status">
+                    <?php echo htmlspecialchars($commande['status'] == 1 ? 'Confirmed' : 'Not Confirmed'); ?>
+                </td>
+                <td data-label="Actions" class="action-links">
+                    <a href="update_commande.php?id=<?php echo $commande['idcommande']; ?>">Update</a>
+                    <a href="payer_commande.php">Payer</a>
+                    <a href="delete_commande.php?id=<?php echo $commande['idcommande']; ?>" class="delete-link" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($commandes as $commande): ?>
-                <tr>
-                    <td data-label="ID Commande"><?php echo htmlspecialchars($commande['idcommande']); ?></td>
-                    <td data-label="ID User"><?php echo htmlspecialchars($commande['iduser']); ?></td>
-                    <td data-label="ID Panier"><?php echo htmlspecialchars($commande['Idpanier']); ?></td>
-                    <td data-label="Date">
-                        <?php 
-                        // Format the date
-                        $date = new DateTime($commande['date']);
-                        echo htmlspecialchars($date->format('d/m/y')); // Output as J/M/A
-                        ?>
-                    </td>                    <td data-label="Status">
-                        <?php echo htmlspecialchars($commande['status'] == 1 ? 'Confirmed' : 'Not Confirmed'); ?>
-                    </td>
-                    <td data-label="Actions" class="action-links">
-                        <a href="update_commande.php?id=<?php echo $commande['idcommande']; ?>">Update</a>
-                        <a href="payer_commande.php">Payer</a>
-                        <a href="delete_commande.php?id=<?php echo $commande['idcommande']; ?>" class="delete-link" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<script>
+function filterTable() {
+    // Get the input value and convert it to lowercase
+    const input = document.getElementById('search');
+    const filter = input.value.toLowerCase();
+    
+    // Get the table and its rows
+    const table = document.getElementById('orderTable');
+    const rows = table.getElementsByTagName('tr');
+
+    // Loop through all table rows, and hide those that don't match the search query
+    for (let i = 1; i < rows.length; i++) { // Start at 1 to skip the header row
+        const cells = rows[i].getElementsByTagName('td');
+        let found = false;
+
+        // Loop through each cell in the row
+        for (let j = 0; j < cells.length; j++) {
+            const cell = cells[j];
+            if (cell) {
+                const textValue = cell.textContent || cell.innerText;
+                if (textValue.toLowerCase().indexOf(filter) > -1) {
+                    found = true;
+                    break; // Stop checking if a match is found
+                }
+            }
+        }
+
+        // Show or hide the row based on the search
+        rows[i].style.display = found ? "" : "none"; // Show if found, hide if not
+    }
+}
+</script>
 
     <footer>
         <!-- Your footer content -->

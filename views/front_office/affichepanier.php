@@ -191,10 +191,10 @@ $carts = $cartController->getAllPanier();
     <h1>Cart Management</h1>
 
 <!-- Table to display the cart information -->
-<table id="cartTable">
+<table id="cartTable" data-sort-order="asc">
     <thead>
         <tr>
-            <th>ID Panier</th>
+            <th onclick="sortTable(0)">ID Panier &#x25B2;&#x25BC;</th>
             <th onclick="sortTable(1)">Total &#x25B2;&#x25BC;</th>
             <th>Status</th>
             <th>Actions</th>
@@ -226,10 +226,11 @@ function sortTable(columnIndex) {
     const isAscending = table.getAttribute('data-sort-order') === 'asc';
 
     rows.sort((a, b) => {
-        const aText = a.cells[columnIndex].textContent.replace(' €', '').replace(',', '.');
-        const bText = b.cells[columnIndex].textContent.replace(' €', '').replace(',', '.');
+        const aText = a.cells[columnIndex].textContent.trim();
+        const bText = b.cells[columnIndex].textContent.trim();
 
-        return isAscending ? aText - bText : bText - aText;
+        // Convert to number for ID Panier sorting and keep as string for others
+        return columnIndex === 0 ? (isAscending ? aText - bText : bText - aText) : (isAscending ? parseFloat(aText.replace(' €', '').replace(',', '.')) - parseFloat(bText.replace(' €', '').replace(',', '.')) : parseFloat(bText.replace(' €', '').replace(',', '.')) - parseFloat(aText.replace(' €', '').replace(',', '.')));
     });
 
     rows.forEach(row => tbody.appendChild(row)); // Reorder the rows in the table body

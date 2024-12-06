@@ -41,10 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Update the cart
         if ($cartController->updatePanier($Idpanier, $total, $status)) {
-            // If status is confirmed, insert into commandes
-            if ($status == 1) {
-                $cartController->insertOrder(1, $Idpanier);
-            }
+            
             // Commit the transaction
             $pdo->commit();
             echo "Cart updated successfully!";

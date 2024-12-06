@@ -156,6 +156,8 @@ $total = 0;
         </table>
         <h3>Total: <?php echo $total; ?> $</h3>
         <form action="confirm_cart.php" method="post">
+        <label for="nom_client">Nom Client:</label>
+        <input type="text" id="nom_client" name="nom_client" required>
             <button type="submit" class="btn btn-success">Confirmer le Panier</button>
         </form>
     </div>
