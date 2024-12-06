@@ -96,12 +96,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt = $db->prepare($query);
             $stmt->bindParam(':id_user', $id_user);
             if ($stmt->execute()) {
-                echo "Utilisateur supprimé!";
+                header("Location: ../view/back_office/pages/tables/basic-table.php");
+                exit();
             } else {
                 echo "Erreur de suppression.";
             }
         }
+
+        // Action: Modifier un utilisateur
+        elseif ($action == 'edit' && isset($_POST['id_user'])) {
+            $id_user = $_POST['id_user'];
+            $nom = filter_input(INPUT_POST, 'Nom', FILTER_SANITIZE_STRING);
+            $prenom = filter_input(INPUT_POST, 'Prenom', FILTER_SANITIZE_STRING);
+            $usermail = filter_input(INPUT_POST, 'usermail', FILTER_SANITIZE_EMAIL);
+            $userRole = filter_input(INPUT_POST, 'userRole', FILTER_SANITIZE_STRING);
+            $adress = filter_input(INPUT_POST, 'adress', FILTER_SANITIZE_STRING);
+            $Nationalite = filter_input(INPUT_POST, 'Nationalite', FILTER_SANITIZE_STRING);
+            $ddn = $_POST['ddn'];  // Date de naissance
+            $num = filter_input(INPUT_POST, 'num', FILTER_SANITIZE_STRING);
+
+            $query = "UPDATE user SET nom = :nom, prenom = :prenom, usermail = :usermail, userRole = :userRole, adress = :adress, Nationalite = :Nationalite, ddn = :ddn, num = :num WHERE id_user = :id_user";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id_user', $id_user);
+            $stmt->bindParam(':nom', $nom);
+            $stmt->bindParam(':prenom', $prenom);
+            $stmt->bindParam(':usermail', $usermail);
+            $stmt->bindParam(':userRole', $userRole);
+            $stmt->bindParam(':adress', $adress);
+            $stmt->bindParam(':Nationalite', $Nationalite);
+            $stmt->bindParam(':ddn', $ddn);
+            $stmt->bindParam(':num', $num);
+
+            if ($stmt->execute()) {
+                echo "Utilisateur mis à jour avec succès!";
+                // Redirection après la mise à jour
+                header("Location: ../view/back_office/pages/tables/basic-table.php");
+                exit();
+            } else {
+                echo "Erreur lors de la mise à jour.";
+            }
+        }
     }
+}
+
+function getUserById($db, $id_user) {
+    $query = "SELECT * FROM user WHERE id_user = :id_user";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 // Fonction de récupération des utilisateurs (avec recherche)

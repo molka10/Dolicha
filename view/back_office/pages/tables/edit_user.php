@@ -153,7 +153,7 @@ if (isset($_GET['id_user'])) {
             <!-- Navbar -->
             <nav class="navbar">
                 <div>
-                    <input type="text" placeholder="Search products" style="padding: 8px 10px; border-radius: 4px; border: 1px solid #ddd;">
+                    <input type="text" placeholder="Search user" style="padding: 8px 10px; border-radius: 4px; border: 1px solid #ddd;">
                 </div>
                 <div class="profile-info">
                     <img src="D:\xampp\htdocs\dolicha\view\back_office\assets\images\faces\face1.jpg" alt="Profile Picture"> <!-- Replace with actual image path -->
