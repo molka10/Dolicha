@@ -79,7 +79,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->bindParam(':num', $num);
 
                     if ($stmt->execute()) {
-                        echo "Inscription réussie!";
+                        header("Location: ..//view/front_office/login.html");
+                        
+                       
+                        
                     } else {
                         echo "Erreur lors de l'inscription.";
                     }
@@ -138,6 +141,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+function getUserName($db, $user_id) {
+    $query = "SELECT nom FROM user WHERE id_user = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchColumn(); // Retourne le champ "name"
+}
+
+
 
 function getUserById($db, $id_user) {
     $query = "SELECT * FROM user WHERE id_user = :id_user";

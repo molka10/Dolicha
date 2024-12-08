@@ -4,106 +4,122 @@ require_once '../../controller/userController.php'; // Include user controller f
 session_start(); // Démarre la session
 
 // Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.html"); // Rediriger vers la page de connexion si non connecté
+if (!isset($_SESSION['user'])) {
+    header("Location: accueil.php"); // Rediriger vers la page de connexion si non connecté
     exit();
 }
+
+// Si le bouton logout est cliqué, on détruit la session et on redirige vers la page de connexion
+if (isset($_POST['logout'])) {
+    session_unset(); // Détruit toutes les variables de session
+    session_destroy(); // Détruit la session
+    header("Location: accueil.php"); // Redirige vers la page de connexion
+    exit();
+}
+
+$user_id = $_SESSION['user']['id']; 
+// Récupérer le nom de l'utilisateur
+$nom = getUserName($db, $user_id); // Fonction qui récupère le nom de l'utilisateur
 
 $db = (new Database())->getConnection();
 ob_end_clean();
 ?>
-	<!DOCTYPE html>
-	<html lang="zxx" class="no-js">
-	<head>
-		<!-- Mobile Specific Meta -->
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<!-- Favicon-->
-		<link rel="shortcut icon" href="img/fav.png">
-		<!-- Author Meta -->
-		<meta name="author" content="colorlib">
-		<!-- Meta Description -->
-		<meta name="description" content="">
-		<!-- Meta Keyword -->
-		<meta name="keywords" content="">
-		<!-- meta character set -->
-		<meta charset="UTF-8">
-		<!-- Site Title -->
-		<title>Travel</title>
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+<head>
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/fav.png">
+    <!-- Author Meta -->
+    <meta name="author" content="colorlib">
+    <!-- Meta Description -->
+    <meta name="description" content="">
+    <!-- Meta Keyword -->
+    <meta name="keywords" content="">
+    <!-- meta character set -->
+    <meta charset="UTF-8">
+    <!-- Site Title -->
+    <title>Travel</title>
 
-		<link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
-			<!--
-			CSS
-			============================================= -->
-			<link rel="stylesheet" href="css/linearicons.css">
-			<link rel="stylesheet" href="css/font-awesome.min.css">
-			<link rel="stylesheet" href="css/bootstrap.css">
-			<link rel="stylesheet" href="css/magnific-popup.css">
-			<link rel="stylesheet" href="css/jquery-ui.css">				
-			<link rel="stylesheet" href="css/nice-select.css">							
-			<link rel="stylesheet" href="css/animate.min.css">
-			<link rel="stylesheet" href="css/owl.carousel.css">				
-			<link rel="stylesheet" href="css/main.css">
-		</head>
-		<body>	
-			<header id="header">
-				<div class="header-top">
-					<div class="container">
-			  		<div class="row align-items-center">
-			  			<div class="col-lg-6 col-sm-6 col-6 header-top-left">
-			  				<ul>
-			  					<li><a href="#">Visit Us</a></li>
-			  					<li><a href="#">Buy Tickets</a></li>
-			  				</ul>			
-			  			</div>
-			  			<div class="col-lg-6 col-sm-6 col-6 header-top-right">
-							<div class="header-social">
-								<a href="#"><i class="fa fa-facebook"></i></a>
-								<a href="#"><i class="fa fa-twitter"></i></a>
-								<a href="#"><i class="fa fa-dribbble"></i></a>
-								<a href="#"><i class="fa fa-behance"></i></a>
-							</div>
-			  			</div>
-			  		</div>			  					
-					</div>
-				</div>
-				<div class="container main-menu">
-					<div class="row align-items-center justify-content-between d-flex">
-				      <div id="logo">
-				        <a href="index.html"><img src="../front_office/img/lo.png" alt="" title=""style="width: 200px; height: 100px;" /></a>
-				      
-					</div>
-				      <nav id="nav-menu-container">
-				        <ul class="nav-menu">
-							
-						  <li><a href="index.html">Home</a></li>
-				          <li><a href="about.html">About</a></li>
-				          <li><a href="hotels.html">Events</a></li>
-				          <li class="menu-has-children"><a href="">event</a>
-				            <ul>
-				              <li><a href="blog-home.html">Camping & Hicking</a></li>
-				              <li><a href="blog-single.html">Tours</a></li>
-							  
-				            </ul>
-				          </li>	
-				          <li class="menu-has-children"><a href="">Activities</a>
-				            <ul>
-				            	  <li><a href="elements.html">workshops</a></li>
-								  <li><a href="blog-single.html">Concerts</a></li>
-						          
-					      
-						          </li>					                		
-				            </ul>
-				          </li>		
-						  <li><a href=""</li>			          		
-						  <li><a href="hotels.html"fa fa-shopping-cart"></i>  shopping-cart</a></li>			          		          
-				          <li><a href="contact.html">Contact</a></li>
-						  <li><a href="signup.html">signup</a></li>
-				         <li><a href="login.html">login</a></li>
-				        </ul>
-				      </nav><!-- #nav-menu-container -->					      		  
-					</div>
-				</div>
-			</header><!-- #header -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
+        <!--
+        CSS
+        ============================================= -->
+        <link rel="stylesheet" href="css/linearicons.css">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/magnific-popup.css">
+        <link rel="stylesheet" href="css/jquery-ui.css">				
+        <link rel="stylesheet" href="css/nice-select.css">							
+        <link rel="stylesheet" href="css/animate.min.css">
+        <link rel="stylesheet" href="css/owl.carousel.css">				
+        <link rel="stylesheet" href="css/main.css">
+</head>
+<body>	
+    <header id="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-sm-6 col-6 header-top-left">
+                        <ul>
+                            <li><a href="#">Visit Us</a></li>
+                            <li><a href="#">Buy Tickets</a></li>
+                        </ul>			
+                    </div>
+
+					<ul>
+                    </ul>
+
+                    <div class="col-lg-6 col-sm-6 col-6 header-top-right">
+                        <div class="header-social">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-dribbble"></i></a>
+                            <a href="#"><i class="fa fa-behance"></i></a>
+                        </div>
+                    </div>
+                </div>			  					
+            </div>
+        </div>
+        <div class="container main-menu">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo">
+                    <a href="index.html"><img src="../front_office/img/lo.png" alt="" title="" style="width: 200px; height: 100px;" /></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="hotels.html">Events</a></li>
+                        <li class="menu-has-children"><a href="">Event</a>
+                            <ul>
+                                <li><a href="blog-home.html">Camping & Hicking</a></li>
+                                <li><a href="blog-single.html">Tours</a></li>
+                            </ul>
+                        </li>	
+                        <li class="menu-has-children"><a href="">Activities</a>
+                            <ul>
+                                <li><a href="elements.html">Workshops</a></li>
+                                <li><a href="blog-single.html">Concerts</a></li>
+                            </ul>
+                        </li>		
+                        <li><a href="hotels.html"><i class="fa fa-shopping-cart"></i> Shopping Cart</a></li>
+						
+                        <li><a href="contact.html">Contact</a></li>
+						<li><a href="profil.php">Hello, <?php echo htmlspecialchars($nom); ?>!</a></li>
+					<php><?php if (isset($_SESSION['user'])): ?>
+    <!-- Afficher le bouton Logout si l'utilisateur est connecté -->
+    <a href="accueil.php" class="btn btn-danger" style="color: white;">Logout</a>
+<?php endif; ?></php>
+                        <li> </li>
+
+                    </ul>
+                </nav><!-- #nav-menu-container -->					      		  
+            </div>
+        </div>
+    </header>
+<!-- #header -->
 			
 			<!-- start banner Area -->
 			<section class="banner-area relative">
