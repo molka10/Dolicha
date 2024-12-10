@@ -25,13 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $num = filter_input(INPUT_POST, 'num', FILTER_SANITIZE_STRING);
 
     // Appel à la fonction de mise à jour de l'utilisateur dans le contrôleur
-    if (updateUser($db, $user_id, $nom, $prenom, $usermail, $userRole, $adress, $Nationalite, $ddn, $num)) {
-        // Mise à jour réussie
-        $_SESSION['user']['usermail'] = $usermail; // Mettre à jour l'email dans la session
-        echo "Profil mis à jour avec succès!";
-    } else {
-        echo "Erreur lors de la mise à jour du profil.";
-    }
 }
 ?>
 
@@ -170,7 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 <input type="text" name="num" id="num" value="<?= htmlspecialchars($user['num']); ?>" required>
             </div>
 
-            <button type="submit">Mettre à jour</button>
+            <button type="submit">edit</button>
         </form>
     </div>
 </main>

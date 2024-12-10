@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
             // Redirection selon le rôle
             if ($user['userRole'] == 'admin') {
-                header("Location: ../back_office/pages/tables/basic-table.php");
+                header("Location: ../back_office/molka.php");
                 exit();
             } 
             elseif (in_array($user['userRole'], ['user', 'vendeur'])) {

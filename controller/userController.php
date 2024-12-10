@@ -93,18 +93,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Action: Supprimer un utilisateur
-        elseif ($action == 'delete' && isset($_POST['id_user'])) {
+        elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'delete') {
             $id_user = $_POST['id_user'];
+        
+            // Supprimer l'utilisateur
             $query = "DELETE FROM user WHERE id_user = :id_user";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':id_user', $id_user);
+            
             if ($stmt->execute()) {
-                header("Location: ../view/back_office/pages/tables/basic-table.php");
+                // Redirection après la suppression
+                header("Location: ../view/back_office/molka.php");
                 exit();
             } else {
-                echo "Erreur de suppression.";
+                echo "Erreur lors de la suppression.";
             }
         }
+        
 
         // Action: Modifier un utilisateur
         elseif ($action == 'edit' && isset($_POST['id_user'])) {
@@ -133,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($stmt->execute()) {
                 echo "Utilisateur mis à jour avec succès!";
                 // Redirection après la mise à jour
-                header("Location: ../view/back_office/pages/tables/basic-table.php");
+                header("Location: ../view/back_office/molka.php");
                 exit();
             } else {
                 echo "Erreur lors de la mise à jour.";
