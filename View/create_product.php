@@ -10,26 +10,26 @@ $productController = new ProductController($pdo);
 $error = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Check required fields
+    
     if (empty($_POST['productName']) || empty($_POST['price']) || empty($_POST['stock']) || empty($_POST['categoryId'])) {
         $error = "All fields are required.";
     } elseif (!isset($_FILES['productImage']) || $_FILES['productImage']['error'] != UPLOAD_ERR_OK) {
         $error = "Product image is required.";
     } else {
-        // Handle file upload
+        
         $imageName = $_FILES['productImage']['name'];
         $imageTempPath = $_FILES['productImage']['tmp_name'];
         $uploadDir = "../uploads/";
         $uploadPath = $uploadDir . basename($imageName);
 
-        // Ensure the upload directory exists
+        
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
 
-        // Move uploaded file to the target directory
+        
         if (move_uploaded_file($imageTempPath, $uploadPath)) {
-            // Save product details in the database
+            
             $productController->createProduct(
                 $_POST['productName'],
                 $_POST['price'],
@@ -348,8 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </span>
       </div>
     </div>
-<!-- Create Product Form -->  
-<div class="row">
+    <div class="row">
   <div class="col-md-8">
     <div class="card">
       <div class="card-header">
@@ -365,32 +364,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-md-6 px-1">
               <div class="form-group">
                 <label>Product Name</label>
-                <input type="text" name="productName" class="form-control" required>
+                <input type="text" name="productName" class="form-control">
                 <div class="error-message" id="productNameError"></div>
               </div>
             </div>
             <div class="col-md-6 px-1">
               <div class="form-group">
                 <label>Price</label>
-                <input type="number" name="price" class="form-control" required>
+                <input type="text" name="price" class="form-control">
                 <div class="error-message" id="priceError"></div>
               </div>
             </div>
             <div class="col-md-6 px-1">
               <div class="form-group">
                 <label>Stock</label>
-                <input type="number" name="stock" class="form-control" required>
+                <input type="text" name="stock" class="form-control">
                 <div class="error-message" id="stockError"></div>
               </div>
             </div>
             <div class="col-md-6 px-1">
               <div class="form-group">
                 <label>Category</label>
-                <select name="categoryId" class="form-control" required>
+                <select name="categoryId" class="form-control">
                   <option value="">Select Category</option>
-                  <!-- PHP to dynamically fetch categories from the database -->
                   <?php
-                  // Fetch categories from the database
+                  
                   $stmt = $pdo->query("SELECT * FROM category");
                   $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   foreach ($categories as $category) {
@@ -404,7 +402,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-md-6 px-1">
               <div class="form-group">
                 <label>Product Image</label>
-                <input type="file" name="productImage" class="form-control" accept="image/*" required>
+                <input type="file" name="productImage" class="form-control" accept="image/*">
                 <div class="error-message" id="productImageError"></div>
               </div>
             </div>
@@ -415,39 +413,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
   </div>
 </div>
-<!-- End of Create Product Form -->
-
-<script>
-function validateProductForm() {
+<script>function validateProductForm() {
   let isValid = true;
 
-  // Clear all error messages
+  
   document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
 
-  // Get form fields
+  
   const productName = document.forms["productForm"]["productName"].value.trim();
   const price = document.forms["productForm"]["price"].value.trim();
   const stock = document.forms["productForm"]["stock"].value.trim();
   const categoryId = document.forms["productForm"]["categoryId"].value.trim();
   const productImage = document.forms["productForm"]["productImage"].value;
 
-  // Validation rules
+ 
   if (productName === "") {
     document.getElementById('productNameError').textContent = "Product Name is required.";
     isValid = false;
   }
+  
   if (price === "" || isNaN(price) || parseFloat(price) <= 0) {
     document.getElementById('priceError').textContent = "Price must be a positive number.";
     isValid = false;
   }
+  
   if (stock === "" || isNaN(stock) || parseInt(stock) < 0) {
     document.getElementById('stockError').textContent = "Stock must be a non-negative integer.";
     isValid = false;
   }
+  
   if (categoryId === "") {
     document.getElementById('categoryError').textContent = "Please select a category.";
     isValid = false;
   }
+  
   if (productImage === "") {
     document.getElementById('productImageError').textContent = "Please upload an image.";
     isValid = false;

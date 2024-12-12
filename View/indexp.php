@@ -3,11 +3,11 @@ include __DIR__ . '/../db.php';
 include __DIR__ . '/../controllers/ProductController.php';
 include __DIR__ . '/../controllers/CategoryController.php';
 
-// Initialize controllers
+
 $productController = new ProductController($pdo);
 $categoryController = new CategoryController($pdo);
 
-// Fetch all products
+
 $products = $productController->getAllProducts();
 ?>
 
@@ -96,7 +96,7 @@ $products = $productController->getAllProducts();
 					  </li>					          					          		          
 					  <li><a href="contact.html">Contact</a></li>
 					</ul>
-				  </nav><!-- #nav-menu-container -->					      		  
+				  </nav><!-- #nav-container -->					      		  
 				</div>
 			</div>
 		</header><!-- #header -->
@@ -131,7 +131,7 @@ $products = $productController->getAllProducts();
 	        </div>
 	        <div class="row">
 	            <?php
-	            // Loop through each product and display it
+	            
 	            foreach ($products as $product) {
 	                $imagePath = !empty($product->getImage()) ? '../uploads/' . htmlspecialchars($product->getImage()) : 'img/default.png';
 	                ?>
@@ -139,7 +139,7 @@ $products = $productController->getAllProducts();
 	                    <div class="single-destinations">
 	                        <div class="thumb">
 	                            <?php 
-	                            // Display product image with preview functionality
+	                            
 	                            if (!empty($product->getImage())) {
 	                                echo "<img src='" . $imagePath . "' alt='" . htmlspecialchars($product->getName()) . "' class='product-image' onclick='showPreview(\"" . $imagePath . "\")' style='cursor: pointer;'>";
 	                            } else {

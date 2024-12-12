@@ -7,7 +7,7 @@ $categories = $controller->getAllCategories();
 $stmt = $pdo->query("SELECT * FROM category");  
 $tab = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if (!empty($tab)) {
-    // PHP Loop to display data
+    
     foreach ($tab as $category) {
         ?>
         <tr>
@@ -21,7 +21,7 @@ if (!empty($tab)) {
         <?php
     }
 } else {
-    echo "<tr><td colspan='3'>No categories found.</td></tr>";  // If no categories are found
+    echo "<tr><td colspan='3'>No categories found.</td></tr>";  
 }
 ?>
 ?>
@@ -353,7 +353,7 @@ if (!empty($tab)) {
 </div>
 <!-- End Category List -->
 <script>
-  // Function to show the image preview in a modal
+  
   function showPreview(src) {
     const modal = document.getElementById('imagePreviewModal');
     const modalImage = document.getElementById('modalImage');
@@ -361,7 +361,7 @@ if (!empty($tab)) {
     modal.style.display = 'flex';
   }
 
-  // Function to close the image preview modal
+  
   function closePreview() {
     const modal = document.getElementById('imagePreviewModal');
     modal.style.display = 'none';

@@ -9,12 +9,12 @@ class ProductController {
         $this->pdo = $pdo;
     }
 
-    // Create Product
+    
     public function createProduct($name, $price, $stock, $idCategory, $image) {
-        // Log input data
+       
         error_log("Creating product: Name = $name, Price = $price, Stock = $stock, Category = $idCategory, Image = $image");
     
-        // Prepare the SQL statement
+        
         $stmt = $this->pdo->prepare("INSERT INTO product (Name, Price, Stock, ID_Category, Image) VALUES (:name, :price, :stock, :idCategory, :image)");
         $stmt->execute([
             'name' => $name,
@@ -23,11 +23,11 @@ class ProductController {
             'idCategory' => $idCategory,
             'image' => $image
         ]);
-        // Return the product object
+        
         return new Product($this->pdo->lastInsertId(), $name, $price, $stock, $idCategory, $image);
     }
 
-    // Get Product by ID
+    
     public function getProduct($id) {
         try {
             $stmt = $this->pdo->prepare("SELECT * FROM product WHERE ID_Product = :id");
@@ -38,35 +38,34 @@ class ProductController {
                 return new Product($data['ID_Product'], $data['Name'], $data['Price'], $data['Stock'], $data['ID_Category'], $data['image']);
             }
             
-            return null; // Return null if no product is found
+            return null; 
         } catch (PDOException $e) {
-            // Log or handle exception
+            
             error_log("Error fetching product: " . $e->getMessage());
             return null;
         }
     }
 
-    // Get All Products
-    // Get All Products with Sorting
+    
     public function getAllProducts($sortBy = null) {
         try {
-            // Base query
+            
             $query = "SELECT * FROM product";
 
-            // Apply sorting based on the selected option
+            
             if ($sortBy === 'LastEdited') {
-                $query .= " ORDER BY last_edited DESC"; // Adjust column name based on your DB schema
+                $query .= " ORDER BY last_edited DESC"; 
             } elseif ($sortBy === 'Stock') {
                 $query .= " ORDER BY Stock DESC";
             } elseif ($sortBy === 'Price') {
                 $query .= " ORDER BY Price ASC";
             }
 
-            // Execute query
+            
             $stmt = $this->pdo->query($query);
             $products = [];
 
-            // Fetch products as Product objects
+            
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $products[] = new Product(
                     $row['ID_Product'],
@@ -78,15 +77,15 @@ class ProductController {
                 );
             }
 
-            return $products; // Return the array of Product objects
+            return $products; 
         } catch (PDOException $e) {
             error_log("Error fetching products: " . $e->getMessage());
-            return []; // Return an empty array if there's an error
+            return []; 
         }
     }
 
 
-    // Update Product
+   // updateProduct
     public function updateProduct($id, $name, $price, $stock, $idCategory, $image) {
         try {
             $stmt = $this->pdo->prepare("UPDATE product SET Name = :name, Price = :price, Stock = :stock, ID_Category = :idCategory, Image = :image WHERE ID_Product = :id");
@@ -103,27 +102,27 @@ class ProductController {
         }
     }
     
-    // Delete Product
+   
     public function deleteProduct($id) {
         try {
             $stmt = $this->pdo->prepare("DELETE FROM product WHERE ID_Product = :id");
             $stmt->execute(['id' => $id]);
         } catch (PDOException $e) {
-            // Log or handle exception
+            
             error_log("Error deleting product: " . $e->getMessage());
         }
     }
 
-    // Get Category Name by ID
+    
     public function getCategoryNameById($categoryId) {
         try {
             $stmt = $this->pdo->prepare("SELECT CategoryName FROM category WHERE ID_Category = :id");
             $stmt->execute(['id' => $categoryId]);
             $category = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            return $category ? $category['CategoryName'] : null; // Return category name or null if not found
+            return $category ? $category['CategoryName'] : null; 
         } catch (PDOException $e) {
-            // Log or handle exception
+            
             error_log("Error fetching category name: " . $e->getMessage());
             return null;
         }

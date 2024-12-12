@@ -6,44 +6,43 @@ include '../controllers/CategoryController.php';
 $productController = new ProductController($pdo);
 $categoryController = new CategoryController($pdo);
 
-$id = $_GET['id']; // Get product ID from URL
-$product = $productController->getProduct($id); // Fetch product by ID
-$categories = $categoryController->getAllCategories(); // Fetch all categories
+$id = $_GET['id']; 
+$product = $productController->getProduct($id); 
+$categories = $categoryController->getAllCategories(); 
 
-// Check if product exists
 if (!$product) {
     die("Error: Product not found.");
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Validate input values
+    
     $name = $_POST['product_name'];
     $price = $_POST['price'];
     $stock = $_POST['stock'];
     $categoryId = $_POST['category_id'];
 
-    // Handle image upload
+    
     $image = null;
     if (isset($_FILES['productImage']) && $_FILES['productImage']['error'] == 0) {
-        // Define upload directory
+        
         $uploadDir = '../uploads/';
         $imageName = basename($_FILES['productImage']['name']);
         $uploadFile = $uploadDir . $imageName;
 
-        // Move uploaded file to the server directory
+        
         if (move_uploaded_file($_FILES['productImage']['tmp_name'], $uploadFile)) {
-            $image = $uploadFile; // Store the path to the uploaded image
+            $image = $uploadFile;
         } else {
-            die("Error uploading image.");
+            die("Error uploading image.");// error
         }
     }
 
-    // Update the product in the database
+    
     $productController->updateProduct($id, $name, $price, $stock, $categoryId, $image);
 
-    // Redirect to the product listing page
+    
     header("Location: index_product.php");
-    exit(); // Ensure script termination after redirect
+    exit(); 
 }
 ?>
 
@@ -409,50 +408,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <h5>Update Product</h5>
         </div>
         <form action="" method="POST" name="myForm" onsubmit="return validateForm()" enctype="multipart/form-data">
-    <!-- Hidden field for product ID -->
+    
     <input type="hidden" name="id" value="<?= htmlspecialchars($product->getId()) ?>">
 
     <div class="form-group">
-        <label for="product_name">Product Name:</label>
-        <input type="text" name="product_name" id="product_name" class="form-control" value="<?= htmlspecialchars($product->getName()) ?>" required>
+        <label for="product_name">Nom du produit :</label>
+        <input type="text" name="product_name" id="product_name" class="form-control" value="<?= htmlspecialchars($product->getName()) ?>">
+        <div class="error-message" id="productNameError"></div>
     </div>
 
     <div class="form-group">
-        <label for="price">Price:</label>
-        <input type="number" name="price" id="price" class="form-control" value="<?= htmlspecialchars($product->getPrice()) ?>" required>
+        <label for="price">Prix :</label>
+        <input type="text" name="price" id="price" class="form-control" value="<?= htmlspecialchars($product->getPrice()) ?>">
+        <div class="error-message" id="productPriceError"></div>
     </div>
 
     <div class="form-group">
-        <label for="stock">Stock:</label>
-        <input type="number" name="stock" id="stock" class="form-control" value="<?= htmlspecialchars($product->getStock()) ?>" required>
+        <label for="stock">Stock :</label>
+        <input type="text" name="stock" id="stock" class="form-control" value="<?= htmlspecialchars($product->getStock()) ?>">
+        <div class="error-message" id="productStockError"></div>
     </div>
 
     <div class="form-group">
-        <label for="category_id">Category:</label>
-        <select name="category_id" id="category_id" class="form-control" required>
-            <option value="">Select a Category</option>
+        <label for="category_id">Catégorie :</label>
+        <select name="category_id" id="category_id" class="form-control">
+            <option value="">Sélectionner une catégorie</option>
             <?php
-            // Fetch all categories and display them in the select dropdown
+            
             $stmt = $pdo->query("SELECT * FROM category");
             while ($category = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                // Check if this category is the current product's category
+                
                 $selected = ($category['ID_Category'] == $product->getIdCategory()) ? 'selected' : '';
                 echo "<option value='{$category['ID_Category']}' $selected>{$category['CategoryName']}</option>";
             }
             ?>
         </select>
+        <div class="error-message" id="productCategoryError"></div>
     </div>
 
-    <!-- Product Image Upload -->
+   
     <div class="col-md-6 px-1">
         <div class="form-group">
-            <label>Product Image</label>
-            <input type="file" name="productImage" class="form-control" accept="image/*">
+            <label>Image du produit</label>
+            <input type="file" name="productImage" class="form-control">
             <div class="error-message" id="productImageError"></div>
         </div>
     </div>
 
-    <button type="submit" class="btn">Update Product</button>
+    <button type="submit" class="btn">Mettre à jour le produit</button>
 </form>
 
     </div>
@@ -463,44 +466,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   function validateForm() {
     let isValid = true;
 
-    // Clear all error messages
+    
     document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
 
-    // Get form fields
-    const productName = document.forms["myForm"]["name"].value.trim(); // Adjusted the name field to "name"
+    
+    const productName = document.forms["myForm"]["product_name"].value.trim();
     const productPrice = document.forms["myForm"]["price"].value.trim();
     const productStock = document.forms["myForm"]["stock"].value.trim();
-    const productCategory = document.forms["myForm"]["category"].value.trim(); // Adjusted to match the category field
+    const productCategory = document.forms["myForm"]["category_id"].value.trim();
+    const productImage = document.forms["myForm"]["productImage"].value.trim();
 
-    // Validation rules
+    
     if (productName === "") {
-      document.getElementById('productNameError').textContent = "Product name is required.";
-      isValid = false;
+        document.getElementById('productNameError').textContent = "Le nom du produit est requis.";
+        isValid = false;
     }
 
     if (productPrice === "") {
-      document.getElementById('productPriceError').textContent = "Product price is required.";
-      isValid = false;
+        document.getElementById('productPriceError').textContent = "Le prix du produit est requis.";
+        isValid = false;
     } else if (isNaN(productPrice) || parseFloat(productPrice) <= 0) {
-      document.getElementById('productPriceError').textContent = "Please enter a valid price.";
-      isValid = false;
+        document.getElementById('productPriceError').textContent = "Veuillez entrer un prix valide.";
+        isValid = false;
     }
 
     if (productStock === "") {
-      document.getElementById('productStockError').textContent = "Stock quantity is required.";
-      isValid = false;
+        document.getElementById('productStockError').textContent = "La quantité en stock est requise.";
+        isValid = false;
     } else if (isNaN(productStock) || parseInt(productStock) < 0) {
-      document.getElementById('productStockError').textContent = "Please enter a valid stock quantity.";
-      isValid = false;
+        document.getElementById('productStockError').textContent = "Veuillez entrer une quantité en stock valide.";
+        isValid = false;
     }
 
     if (productCategory === "") {
-      document.getElementById('productCategoryError').textContent = "Category is required.";
-      isValid = false;
+        document.getElementById('productCategoryError').textContent = "La catégorie est requise.";
+        isValid = false;
+    }
+
+    if (productImage === "") {
+        document.getElementById('productImageError').textContent = "L'image du produit est requise.";
+        isValid = false;
     }
 
     return isValid;
-  }
+}
+
 </script>
 
 

@@ -3,25 +3,25 @@ include '../db.php';
 include '../controllers/CategoryController.php';
 
 $controller = new CategoryController($pdo);
-
+//CategoryController
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get the category name from the form
-    $categoryName = $_POST['categoryName'];  // Change 'name' to 'categoryName'
+    
+    $categoryName = $_POST['categoryName'];  
 
-    // Define the valid ENUM values manually
+    
     $validCategories = ['Man', 'Woman', 'Accessory'];
 
-    // Validate input against allowed values
+   
     if (in_array($categoryName, $validCategories)) {
-        // Valid input, proceed to create category
+        
         $controller->createCategory($categoryName);
         header("Location: index.php");
         exit;
     } else {
-        // Invalid input, display an error
+        
         $error = "Invalid category name. Please choose a valid category.";
     }
-}
+}// 
 
 ?>
 <!DOCTYPE html>
@@ -325,8 +325,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       </div>
     </div>
     
-   <!-- Create Categories Form --> 
-<div class="row">
+   <!-- Form --> 
+   <div class="row">
   <div class="col-md-8">
     <div class="card">
       <div class="card-header">
@@ -342,13 +342,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-md-6 px-1">
               <div class="form-group">
                 <label>Category Name</label>
-                <select name="categoryName" class="form-control" required>
+                <select name="categoryName" class="form-control">
                   <option value="">Select Category</option>
                   <option value="Man">Man</option>
                   <option value="Woman">Woman</option>
                   <option value="Accessory">Accessory</option>
                 </select>
-                <div class="error-message" id="categoryNameError"></div>
+                <div class="error-message" id="categoryNameError" style="color: red;"></div>
               </div>
             </div>
           </div>
@@ -359,32 +359,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   </div>
 </div>
 
-<!-- End of Create Categories Form -->
+<!-- -->
 
 <script>
   function validateCategoryForm() {
-    let isValid = true;
+  let isValid = true;
 
-    // Clear all error messages
-    document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
+  
+  document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
 
-    // Get form field
-    const categoryName = document.forms["categoryForm"]["categoryName"].value.trim();
+  
+  const categoryName = document.forms["categoryForm"]["categoryName"].value.trim();
 
-    // Allowed values
-    const allowedValues = ["Man", "Woman", "Accessory"];
+  
+  const allowedValues = ["Man", "Woman", "Accessory"];
 
-    // Validation rules
-    if (categoryName === "") {
-      document.getElementById('categoryNameError').textContent = "Category Name is required.";
-      isValid = false;
-    } else if (!allowedValues.includes(categoryName)) {
-      document.getElementById('categoryNameError').textContent = "Category Name must be 'Man', 'Woman', or 'Accessory'.";
-      isValid = false;
-    }
-
-    return isValid;
+  
+  if (categoryName === "") {
+    document.getElementById('categoryNameError').textContent = "Category Name is required.";
+    isValid = false;
+  } else if (!allowedValues.includes(categoryName)) {
+    document.getElementById('categoryNameError').textContent = "Category Name must be 'Man', 'Woman', or 'Accessory'.";
+    isValid = false;
   }
+
+  return isValid;
+}
+
 </script>
 
 <footer class="footer">

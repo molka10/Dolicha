@@ -1,17 +1,17 @@
 <?php
-// Include necessary files
+
 include '../db.php';
 include '../controllers/ProductController.php';
 include '../controllers/CategoryController.php';
 
-// Initialize controllers
+
 $productController = new ProductController($pdo);
 $categoryController = new CategoryController($pdo);
 
-// Fetch sorting option (if any)
+
 $sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : null;
 
-// Fetch products with optional sorting
+
 $products = $productController->getAllProducts($sortBy);
 ?>
 
@@ -252,9 +252,9 @@ $products = $productController->getAllProducts($sortBy);
           </button>
         </div>
       </nav>
-      <!-- partial -->
+      
       <div class="container-fluid page-body-wrapper">
-        <!-- partial:partials/_sidebar.html -->
+        
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
           <ul class="nav">
             <li class="nav-item nav-category">Main</li>
@@ -322,10 +322,10 @@ $products = $productController->getAllProducts($sortBy);
             </li>
           </ul>
         </nav>
-        <!-- partial -->
+        
         <div class="main-panel">
         <div class="main-panel">            
-            <!-- Begin Category List -->
+            
             <div class="panel-header panel-header-lg">
         <div class="canvas" id="bigDashboardChart"></div>
     </div>
@@ -335,7 +335,7 @@ $products = $productController->getAllProducts($sortBy);
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-category">Product List</h5>
-                        <!-- Sorting Dropdown -->
+                        
                         <select id="sort_by" onchange="sortProducts()">
                             <option value="">Sort by</option>
                             <option value="LastEdited">Last Edited</option>
@@ -366,14 +366,14 @@ $products = $productController->getAllProducts($sortBy);
                                             <td><?= htmlspecialchars($product->getStock()); ?></td>
                                             <td>
                                                 <?php 
-                                                // Get category name
+                                                
                                                 $category = $categoryController->getCategoryById($product->getIdCategory());
                                                 echo $category ? htmlspecialchars($category['CategoryName']) : 'Unknown';
                                                 ?>
                                             </td>
                                             <td>
                                                 <?php 
-                                                // Display product image with preview functionality
+                                                
                                                 if (!empty($product->getImage())) {
                                                     echo "<img src='../uploads/" . htmlspecialchars($product->getImage()) . "' alt='" . htmlspecialchars($product->getName()) . "' class='product-image' onclick='showPreview(\"../uploads/" . htmlspecialchars($product->getImage()) . "\")' style='cursor: pointer;'>";
                                                 } else {
@@ -400,14 +400,14 @@ $products = $productController->getAllProducts($sortBy);
         </div>
     </div>
 
-    <!-- Modal for Image Preview -->
+    
     <div id="imagePreviewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0, 0, 0, 0.7); justify-content:center; align-items:center;">
         <span onclick="closePreview()" style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer;">&times;</span>
         <img id="modalImage" style="max-width:90%; max-height:90%; object-fit:contain;" src="" alt="Image Preview">
     </div>
 
     <script>
-        // Function to show the image preview in a modal
+        
         function showPreview(src) {
             const modal = document.getElementById('imagePreviewModal');
             const modalImage = document.getElementById('modalImage');
@@ -415,15 +415,15 @@ $products = $productController->getAllProducts($sortBy);
             modal.style.display = 'flex';
         }
 
-        // Function to close the image preview modal
+        
         function closePreview() {
             const modal = document.getElementById('imagePreviewModal');
             modal.style.display = 'none';
         }
 
-        // Function to handle product sorting
+        
         function sortProducts() {
             const sortBy = document.getElementById('sort_by').value;
-            window.location.href = "?sort_by=" + sortBy;  // Refresh page with sorting option in the query string
+            window.location.href = "?sort_by=" + sortBy;  
         }
     </script>

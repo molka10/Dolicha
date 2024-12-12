@@ -4,11 +4,11 @@ include '../controllers/CategoryController.php';
 
 $controller = new CategoryController($pdo);
 
-// Validate the 'id' parameter
+
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $id = (int)$_GET['id'];
 
-    // Fetch the category to edit using the existing getCategory method
+    
     $category = $controller->getCategory($id);
 
     if (!$category) {
@@ -21,26 +21,26 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $categoryName = $_POST['category_name'];  // This matches the name attribute in your form
-    $categoryId = $_POST['id'];  // Ensure this matches the hidden field for the category ID
+    $categoryName = $_POST['category_name']; 
+    $categoryId = $_POST['id'];  
 
-    // Define valid ENUM values manually
+    
     $validCategories = ['Man', 'Woman', 'Accessory'];
 
-    // Validate the input
+    
     if (in_array($categoryName, $validCategories)) {
-        // Valid input, update the category
+       
         $controller->updateCategory($categoryId, $categoryName);
         header("Location: index.php");
         exit;
     } else {
-        // Invalid input, show an error
+        
         $error = "Invalid category name. Please choose a valid category.";
     }
 }
 ?>
 
-<!-- update.php -->
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -431,19 +431,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <!-- main-panel ends -->
       </div>
-      <!-- page-body-wrapper ends -->
+      <!-- page -->
     </div>
     <script>
   function validateForm() {
     let isValid = true;
 
-    // Clear all error messages
     document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
 
-    // Get form fields
     const categoryName = document.forms["myForm"]["category_name"].value.trim();
 
-    // Validation rule for Category Name
+    
     if (categoryName === "") {
       document.getElementById('categoryNameError').textContent = "Le champ Nom de la catégorie est requis.";
       isValid = false;

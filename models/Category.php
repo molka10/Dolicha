@@ -12,7 +12,7 @@ class Category {
         return $this->id;
     }
 
-    public function getCategoryName() { // Ensure this method exists
+    public function getCategoryName() {
         return $this->categoryName;
     }
 

@@ -5,7 +5,7 @@ class Product {
     private $price;
     private $stock;
     private $idCategory;
-    private $image; // Ensure this property is declared here
+    private $image; 
 
     public function __construct($id, $name, $price, $stock, $idCategory, $image) {
         $this->id = $id;
@@ -13,7 +13,7 @@ class Product {
         $this->price = $price;
         $this->stock = $stock;
         $this->idCategory = $idCategory;
-        $this->image = $image; // Assign the image parameter to the image property
+        $this->image = $image; 
     }
 
     public function getId() {
@@ -33,7 +33,7 @@ class Product {
     }
 
     public function getImage() {
-        return $this->image; // Ensure the method is defined correctly
+        return $this->image; 
     }
 
     public function getIdCategory() {
