@@ -271,6 +271,12 @@ if (!empty($tab)) {
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="chart_Bar.php">
+                <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
+                <span class="menu-title">Bar Charts</span>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="index_product.php">
                 <span class="icon-bg"><i class="mdi mdi-table-large menu-icon"></i></span>
                 <span class="menu-title">Dashboard product</span>

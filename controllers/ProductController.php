@@ -127,43 +127,19 @@ class ProductController {
             return null;
         }
     }
-
-    
-    /*public function getAllProducts($sortOption = 'name') {
-    try {
-        // Define the SQL ORDER BY clause based on the sort option
-        $orderByClause = 'ORDER BY Name'; // Default sorting by product name
-
-        if ($sortOption == 'price') {
-            $orderByClause = 'ORDER BY Price';
-        } elseif ($sortOption == 'stock') {
-            $orderByClause = 'ORDER BY Stock';
-        } elseif ($sortOption == 'last_edited') {
-            $orderByClause = 'ORDER BY LastEdited DESC'; // Assuming you have a LastEdited column
+    public function getTopSellingProductsByStock($limit = 10) {
+        try {
+            $stmt = $this->pdo->prepare("SELECT Name, Stock FROM product ORDER BY Stock DESC LIMIT :limit");
+            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $products;
+        } catch (PDOException $e) {
+            error_log("Error fetching top-selling products: " . $e->getMessage());
+            return [];
         }
-
-        // Fetch products with sorting applied
-        $stmt = $this->pdo->query("SELECT * FROM product $orderByClause");
-        $products = [];
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $products[] = new Product(
-                $row['ID_Product'],
-                $row['Name'],
-                $row['Price'],
-                $row['Stock'],
-                $row['ID_Category'],
-                $row['Image']
-            );
-        }
-
-        return $products;
-    } catch (PDOException $e) {
-        error_log("Error fetching all products: " . $e->getMessage());
-        return [];
     }
-}*/
-
+    
     
 }
 ?>

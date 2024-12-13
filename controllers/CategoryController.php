@@ -123,6 +123,31 @@ class CategoryController {
         }
     }
     
+    public function getSalesDistributionByCategory() {
+        try {
+            $sql = "
+                SELECT c.CategoryName, SUM(p.price * p.stock) AS TotalRevenue
+                FROM category c
+                JOIN product p ON c.ID_Category = p.ID_Category
+                GROUP BY c.CategoryName
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching sales distribution: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
 
 ?>

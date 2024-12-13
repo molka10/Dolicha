@@ -338,9 +338,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="pages/charts/chartjs.html">
+              <a class="nav-link" href="chart.php">
                 <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
                 <span class="menu-title">Charts</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="chart_Bar.php">
+                <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
+                <span class="menu-title">Bar Charts</span>
               </a>
             </li>
             <li class="nav-item">

@@ -6,7 +6,6 @@ include '../controllers/CategoryController.php';
 
 // Initialize the controller
 $categoryController = new CategoryController($pdo);
-
 if (isset($_GET['type'])) {
   header('Content-Type: application/json');
 
@@ -14,10 +13,11 @@ if (isset($_GET['type'])) {
       echo json_encode($categoryController->getStockDistributionByCategory());
   } elseif ($_GET['type'] === 'product') {
       echo json_encode($categoryController->getProductDistributionByCategory());
+  } elseif ($_GET['type'] === 'sales') {
+      echo json_encode($categoryController->getSalesDistributionByCategory());
   }
   exit;
 }
-
 ?>
 
 
@@ -58,10 +58,16 @@ if (isset($_GET['type'])) {
             text-align: center;
         }
 
-        canvas {
-            max-width: 100%;
-            height: auto;
-        }
+        .card {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+canvas {
+    width: 100%;
+    height: auto;
+}
     </style>
 
   </head>
@@ -288,6 +294,12 @@ if (isset($_GET['type'])) {
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="chart_Bar.php">
+                <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
+                <span class="menu-title">Bar Charts</span>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="index_product.php">
                 <span class="icon-bg"><i class="mdi mdi-table-large menu-icon"></i></span>
                 <span class="menu-title">Dashboard product</span>
@@ -338,95 +350,128 @@ if (isset($_GET['type'])) {
         </ol>
       </nav>
     </div>
-
     <div class="row">
-      <!-- Stock Distribution Pie Chart -->
+      <!-- Stock Distribution Chart -->
       <div class="col-lg-6 grid-margin stretch-card">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title">Stock Distribution by Category</h4>
-            <canvas id="stockChart" width="400" height="400"></canvas>
-          </div>
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Stock Distribution By Category</h4>
+            <canvas id="stockChart"></canvas>
         </div>
-      </div>
+    </div>
+</div>
 
-      <!-- Product Distribution Pie Chart -->
-      <div class="col-lg-6 grid-margin stretch-card">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title">Product Distribution by Category</h4>
-            <canvas id="productChart" width="400" height="400"></canvas>
-          </div>
+<div class="col-lg-6 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Product Distribution By Category</h4>
+            <canvas id="productChart"></canvas>
         </div>
-      </div>
+    </div>
+</div>
+
+<div class="col-lg-6 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Sales Share By Category</h4>
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+</div>
+
     </div>
   </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  // Fetch and render Stock Distribution Chart
-  fetch('chart.php?type=stock')
-    .then(response => response.json())
-    .then(data => {
-      const stockLabels = data.map(item => item.CategoryName);
-      const stockData = data.map(item => item.TotalStock);
+// Fetch Stock Distribution
+fetch('chart.php?type=stock')
+  .then(response => response.json())
+  .then(data => {
+    const stockLabels = data.map(item => item.CategoryName);
+    const stockData = data.map(item => item.TotalStock);
 
-      const ctxStock = document.getElementById('stockChart').getContext('2d');
-      new Chart(ctxStock, {
-        type: 'pie',
-        data: {
-          labels: stockLabels,
-          datasets: [{
-            label: 'Stock Distribution',
-            data: stockData,
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF5722'],
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-          }
+    const ctxStock = document.getElementById('stockChart').getContext('2d');
+    new Chart(ctxStock, {
+      type: 'pie',
+      data: {
+        labels: stockLabels,
+        datasets: [{
+          label: 'Stock Distribution',
+          data: stockData,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF5722'],
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
         }
-      });
-    })
-    .catch(error => console.error('Error fetching stock distribution data:', error));
+      }
+    });
+  });
 
-  // Fetch and render Product Distribution Chart
-  fetch('chart.php?type=product')
-    .then(response => response.json())
-    .then(data => {
-      const productLabels = data.map(item => item.CategoryName);
-      const productData = data.map(item => item.ProductCount);
+// Fetch Product Distribution
+fetch('chart.php?type=product')
+  .then(response => response.json())
+  .then(data => {
+    const productLabels = data.map(item => item.CategoryName);
+    const productData = data.map(item => item.ProductCount);
 
-      const ctxProduct = document.getElementById('productChart').getContext('2d');
-      new Chart(ctxProduct, {
-        type: 'pie',
-        data: {
-          labels: productLabels,
-          datasets: [{
-            label: 'Product Distribution',
-            data: productData,
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF5722'],
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-          }
+    const ctxProduct = document.getElementById('productChart').getContext('2d');
+    new Chart(ctxProduct, {
+      type: 'pie',
+      data: {
+        labels: productLabels,
+        datasets: [{
+          label: 'Product Distribution',
+          data: productData,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF5722'],
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
         }
-      });
-    })
-    .catch(error => console.error('Error fetching product distribution data:', error));
-});
+      }
+    });
+  });
+
+// Fetch Sales Distribution
+fetch('chart.php?type=sales')
+  .then(response => response.json())
+  .then(data => {
+    const salesLabels = data.map(item => item.CategoryName);
+    const salesData = data.map(item => item.TotalRevenue); // Using TotalRevenue
+
+    const ctxSales = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctxSales, {
+      type: 'pie',
+      data: {
+        labels: salesLabels,
+        datasets: [{
+          label: 'Sales Share',
+          data: salesData,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF5722'],
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+        }
+      }
+    });
+  });
+
 </script>
-
 
 
 
