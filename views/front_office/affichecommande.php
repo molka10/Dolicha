@@ -167,8 +167,7 @@ $commandes = $commandeController->getAllCommandes();
                         <li><a href="contact.html">Contact</a></li>
                         <!-- New Buttons for Cart -->
                         <li><a href="view_cart.php"><i class="fa fa-shopping-cart"></i> View Cart</a></li>
-                        <li><a href="affichepanier.php"><i class="fa fa-shopping-cart"></i> View All Carts</a></li>
-                        <li><a href="affichecommande.php"><i class="fa fa-shopping-cart"></i> Commandes</a></li>
+                        <li><a href="affichecommande.php"><i class="fa fa-shopping-cart"></i> Historique</a></li>
 
                     </ul>
                 </nav><!-- #nav-menu-container -->                          
@@ -181,140 +180,284 @@ $commandes = $commandeController->getAllCommandes();
         <div class="container">
             <div class="row d-flex align-items-center justify-content-center">
                 <div class="about-content col-lg-12">
-                    <h1 class="text-white">Commandes</h1>
-                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="insurance.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichecommande.php">Commandes</a></p>
+                    <h1 class="text-white">Historique</h1>
+                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="insurance.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichecommande.php">Historique</a></p>
                 </div>
             </div>
         </div>
     </section>
-    <title>Order Management</title>
+    <title>Historiques</title>
 
     <!-- CSS -->
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        h1 {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f7f7f7;
+            color: #333;
+            padding: 20px;
+        }
+
+        header {
+            
+            color: white;
+            padding: 40px;
             text-align: center;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
+        header h1 {
+            font-size: 3rem;
         }
 
-        th, td {
-            padding: 12px;
-            text-align: left;
+        .search-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            width: 70%;
+            max-width: 400px;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 30px;
             border: 1px solid #ddd;
+            outline: none;
+            background: #fff;
+            transition: transform 0.2s ease;
         }
 
-        th {
-            background-color: #f2f2f2;
+        .search-bar:focus {
+            transform: scale(1.05);
+            border-color: #333;
         }
 
-        tr:hover {
-            background-color: #f5f5f5;
+        .order-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 30px; /* Increase padding for more height */
+            min-height: 300px; /* Increase minimum height */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .action-links {
+        .order-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .order-card .card-header {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
-        .delete-link {
-            color: red;
+        .order-card h3 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .order-card .status {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .order-card .status.pending {
+            color: #e74c3c; /* Red color for pending */
+        }
+
+        .order-card .details {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .order-card .total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .order-card .action-buttons {
+        margin-top: 20px; /* Add margin to push buttons down */
+    }
+
+        .order-card .action-buttons a {
             text-decoration: none;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 1rem;
+            color: white;
+            transition: background-color 0.3s ease;
         }
 
-        .delete-link:hover {
-            text-decoration: underline;
+        .action-buttons .update-btn {
+            background-color: #888;
         }
-    </style>
-</head>
-<body>    
-    <header id="header">
-        <!-- Your header content here -->
-    </header>
 
-    <h1>Order Management</h1>
+        .action-buttons .delete-btn {
+            background-color: #e74c3c; /* Red for delete */
+        }
 
-<!-- Search Bar -->
-<label for="search">Search by Nom Client:</label>
-<input type="text" id="search" onkeyup="filterTable()" placeholder="Type to search...">
+        .action-buttons .update-btn:hover {
+            background-color: #555;
+        }
 
-<!-- Table to display the order information -->
-<table id="orderTable">
-    <thead>
-        <tr>
-            <th>ID Commande</th>
-            <th>Nom Client</th>
-            <th>ID Panier</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($commandes as $commande): ?>
-            <tr>
-                <td data-label="ID Commande"><?php echo htmlspecialchars($commande['idcommande']); ?></td>
-                <td data-label="Nom Client"><?php echo htmlspecialchars($commande['nom_client']); ?></td>
-                <td data-label="ID Panier"><?php echo htmlspecialchars($commande['Idpanier']); ?></td>
-                <td data-label="Date">
-                    <?php 
-                    // Format the date
-                    $date = new DateTime($commande['date']);
-                    echo htmlspecialchars($date->format('d/m/y')); // Output as d/m/y
-                    ?>
-                </td>
-                <td data-label="Status">
-                    <?php echo htmlspecialchars($commande['status'] == 1 ? 'Confirmed' : 'Not Confirmed'); ?>
-                </td>
-                <td data-label="Actions" class="action-links">
-                    <a href="update_commande.php?id=<?php echo $commande['idcommande']; ?>">Update</a>
-                    <a href="payer_commande.php">Payer</a>
-                    <a href="delete_commande.php?id=<?php echo $commande['idcommande']; ?>" class="delete-link" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        .action-buttons .delete-btn:hover {
+            background-color: #c0392b; /* Darker red */
+        }
 
-<script>
-function filterTable() {
-    // Get the input value and convert it to lowercase
-    const input = document.getElementById('search');
-    const filter = input.value.toLowerCase();
-    
-    // Get the table and its rows
-    const table = document.getElementById('orderTable');
-    const rows = table.getElementsByTagName('tr');
-
-    // Loop through all table rows, and hide those that don't match the search query
-    for (let i = 1; i < rows.length; i++) { // Start at 1 to skip the header row
-        const cells = rows[i].getElementsByTagName('td');
-        let found = false;
-
-        // Loop through each cell in the row
-        for (let j = 0; j < cells.length; j++) {
-            const cell = cells[j];
-            if (cell) {
-                const textValue = cell.textContent || cell.innerText;
-                if (textValue.toLowerCase().indexOf(filter) > -1) {
-                    found = true;
-                    break; // Stop checking if a match is found
-                }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .order-card {
+                width: 90%;
+                margin: 10px auto;
             }
         }
-
-        // Show or hide the row based on the search
-        rows[i].style.display = found ? "" : "none"; // Show if found, hide if not
-    }
+        /* Sorting Buttons Container */
+.sorting-buttons {
+    display: flex;
+    justify-content: center; /* Center align the buttons horizontally */
+    margin-bottom: 20px;
+    gap: 15px; /* Adds space between the buttons */
 }
+
+/* Styling for Sorting Buttons */
+.sorting-buttons button {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    padding: 10px 20px; /* Adjust padding for better size */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for background and transform */
+}
+
+/* Hover Effects for Buttons */
+.sorting-buttons button:hover {
+    background-color: #45a049; /* Darker green on hover */
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+/* Active Button State (for clicked button) */
+.sorting-buttons button:active {
+    background-color: #388e3c; /* Even darker green when clicked */
+    transform: scale(1.1); /* Slightly larger when clicked */
+}
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Historiques</h1>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search" class="search-bar" onkeyup="filterTable()" placeholder="🔍 Search by Nom Client...">
+    </div>
+
+    <!-- Sorting Buttons: Place them above or below the search bar -->
+    <div class="sorting-buttons">
+    <button class="sort-total" onclick="sortTable('data-total')">Sort by Total</button>
+    <button class="sort-date" onclick="sortTable('data-date')">Sort by Date</button>
+</div>
+
+
+    <div class="order-container" id="orderContainer">
+        <!-- Dynamically generated cards for each order -->
+        <?php foreach ($commandes as $commande): ?>
+            <div class="order-card" data-id="<?php echo htmlspecialchars($commande['idcommande']); ?>" data-client="<?php echo htmlspecialchars($commande['nom_client']); ?>" data-status="<?php echo $commande['status']; ?>" data-total="<?php echo $commande['total']; ?>" data-date="<?php echo $commande['date']; ?>">
+                <div class="card-header">
+                    <h3>Commande #<?php echo htmlspecialchars($commande['idcommande']); ?></h3>
+                    <span class="status <?php echo $commande['status'] == 1 ? '' : 'pending'; ?>">
+                        <?php echo $commande['status'] == 1 ? 'Confirmed' : 'Pending'; ?>
+                    </span>
+                </div>
+                <div class="details">
+                    <p><strong>Client:</strong> <?php echo htmlspecialchars($commande['nom_client']); ?></p>
+                    <p><strong>Panier ID:</strong> <?php echo htmlspecialchars($commande['Idpanier']); ?></p>
+                    <p><strong>Date:</strong> 
+                        <?php 
+                        $date = new DateTime($commande['date']);
+                        echo $date->format('d/m/y');
+                        ?>
+                    </p>
+                </div>
+                <div class="total">
+                    <strong>Total:</strong> $<?php echo htmlspecialchars($commande['total']); ?>
+                </div>
+                <div class="action-buttons">
+                    <a href="update_commande.php?id=<?php echo $commande['idcommande']; ?>" class="update-btn">Update</a>
+                    <a href="delete_commande.php?id=<?php echo $commande['idcommande']; ?>" class="delete-btn" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+<script>
+    // Filter function to search by Nom Client in dynamically generated cards
+    function filterTable() {
+        var input = document.getElementById("search");
+        var filter = input.value.toUpperCase();
+        var orderCards = document.getElementsByClassName("order-card");
+
+        for (var i = 0; i < orderCards.length; i++) {
+            var client = orderCards[i].getAttribute("data-client");
+            if (client.toUpperCase().indexOf(filter) > -1) {
+                orderCards[i].style.display = ""; // Show the card
+            } else {
+                orderCards[i].style.display = "none"; // Hide the card
+            }
+        }
+    }
+
+    // Sort function to sort cards by Total or Date (numeric or date values)
+    function sortTable(attribute) {
+        var orderCards = Array.from(document.getElementsByClassName("order-card"));
+        var isAscending = document.getElementById("orderContainer").getAttribute('data-sort-order') === 'asc';
+
+        orderCards.sort(function(a, b) {
+            var aText = a.getAttribute(attribute);
+            var bText = b.getAttribute(attribute);
+
+            if (attribute === "data-total") { // Sort by numeric values (Total)
+                aText = parseFloat(aText.replace('$', '').trim()) || 0;
+                bText = parseFloat(bText.replace('$', '').trim()) || 0;
+            } else if (attribute === "data-date") { // Sort by Date
+                aText = new Date(aText);
+                bText = new Date(bText);
+            }
+
+            return isAscending ? aText > bText ? 1 : -1 : aText < bText ? 1 : -1;
+        });
+
+        // Append sorted cards back to the container
+        var container = document.querySelector(".order-container");
+        orderCards.forEach(function(card) {
+            container.appendChild(card);
+        });
+
+        // Toggle sort order
+        document.getElementById("orderContainer").setAttribute('data-sort-order', isAscending ? 'desc' : 'asc');
+    }
 </script>
+</body>
+
+
 
     <footer>
         <!-- Your footer content -->
