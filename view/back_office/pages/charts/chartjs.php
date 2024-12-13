@@ -20,6 +20,9 @@
     <link rel="shortcut icon" href="../../assets/images/favicon.png" />
   </head>
   <body>
+
+
+    
     <div class="container-scroller">
       <!-- partial:../../partials/_navbar.html -->
       <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -320,7 +323,71 @@
                   <div class="card-body">
                     <h4 class="card-title">Doughnut chart</h4>
                     <canvas id="doughnutChart" style="height:250px"></canvas>
-                  </div>
+                  </div><div class="container">
+                    <h1>Tableau de bord - Statistiques des utilisateurs</h1>
+                    
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Statistiques des utilisateurs</h4>
+                                <canvas id="doughnutChart" style="height:250px"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Inclure Chart.js -->
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <div class="container">
+    <h1>Tableau de bord - Statistiques des utilisateurs</h1>
+    
+    <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Doughnut chart</h4>
+                <canvas id="doughnutChart" style="height:250px"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Récupérer les valeurs PHP et les convertir en JSON pour les utiliser dans JavaScript
+        var totalUsers = <?php echo $totalUsers; ?>;
+        var totalAdmins = <?php echo $totalAdmins; ?>;
+        var totalVendeurs = <?php echo $totalVendeurs; ?>;
+
+        // Créer le graphique Doughnut avec Chart.js
+        var ctx = document.getElementById('doughnutChart').getContext('2d');
+        var doughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Utilisateurs', 'Administrateurs', 'Vendeurs'],
+                datasets: [{
+                    label: 'Statistiques des utilisateurs',
+                    data: [totalUsers, totalAdmins, totalVendeurs], // Données envoyées depuis PHP
+                    backgroundColor: ['#FFB6C1', '#4CAF50', '#FFD700'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</div>
+                </script>
                 </div>
               </div>
             </div>

@@ -68,7 +68,7 @@
             <!-- Redirection vers la page login.html -->
             <button onclick="window.location.href='login.html'">Se connecter</button>
             <!-- Redirection vers la page signup.html -->
-            <button onclick="window.location.href='signup.html'">S'inscrire</button>
+            <button onclick="window.location.href='signup.php'">S'inscrire</button>
         </div>
     </div>
 </body>

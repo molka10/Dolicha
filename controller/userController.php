@@ -160,14 +160,76 @@ function getUserName($db, $user_id) {
 function getUserById($db, $id_user) {
     $query = "SELECT * FROM user WHERE id_user = :id_user";
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+    $stmt->bindParam(':id_user', $id_user);
     $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if user was found
+    if ($result === false) {
+        return null; // Return null if no user was found
+    }
+    return $result;
 }
+
+function updateUser($db, $id_user, $nom, $prenom, $usermail, $adress, $Nationalite, $ddn, $num) {
+    $query = "UPDATE user SET nom = :nom, prenom = :prenom, usermail = :usermail, adress = :adress, 
+              Nationalite = :Nationalite, ddn = :ddn, num = :num WHERE id_user = :id_user";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':id_user', $id_user);
+    $stmt->bindParam(':nom', $nom);
+    $stmt->bindParam(':prenom', $prenom);
+    $stmt->bindParam(':usermail', $usermail);
+    $stmt->bindParam(':adress', $adress);
+    $stmt->bindParam(':Nationalite', $Nationalite);
+    $stmt->bindParam(':ddn', $ddn);
+    $stmt->bindParam(':num', $num);
+
+    return $stmt->execute();
+}
+
+ function countAdmins()
+{
+    try {
+        $pdo = config::getConnexion();
+        $query = $pdo->prepare('SELECT COUNT(*) as count FROM user');
+        $query->execute();
+
+        $result = $query->fetch(PDO::FETCH_ASSOC);
+
+        return $result['count'];
+    } catch (PDOException $e) {
+        die('Error: ' . $e->getMessage());
+    }
+}
+
+// Fonction pour compter les utilisateurs par rôle
+
+// Inclure la classe Database et la connexion
+ // Initialiser la connexion à la base de données
+
+// Définir la fonction pour récupérer le nombre d'utilisateurs par rôle
+function countUsersByRole($db, $role) {
+    $query = "SELECT COUNT(*) FROM user WHERE userRole = :role";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':role', $role);
+    $stmt->execute();
+    return $stmt->fetchColumn(); // Retourne le nombre d'utilisateurs avec ce rôle
+}
+
+// Récupérer les statistiques
+$totalUsers = countUsersByRole($db, 'user');
+$totalAdmins = countUsersByRole($db, 'admin');
+$totalVendeurs = countUsersByRole($db, 'vendeur');
+
+// Passer ces données à votre vue (exemple)
+include '../view/back_office/pages/charts/chartjs.php';  // Inclure la vue pour afficher les statistiques
+// Inclure la vue pour afficher les statistiques
+
 
 // Fonction de récupération des utilisateurs (avec recherche)
 function getAllUsers($db, $search = null) {
     $query = "SELECT * FROM user";
+    
     if ($search) {
         $query .= " WHERE nom LIKE :search OR prenom LIKE :search OR usermail LIKE :search";
     }
@@ -175,11 +237,10 @@ function getAllUsers($db, $search = null) {
     $stmt = $db->prepare($query);
 
     if ($search) {
-        $searchTerm = "%" . $search . "%"; 
-        $stmt->bindParam(':search', $searchTerm);
+        $searchTerm = "%" . $search . "%"; // Ajoute les jokers pour une recherche partielle
+        $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
     }
 
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-?>

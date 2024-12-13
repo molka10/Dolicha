@@ -4,10 +4,7 @@ require_once '../../controller/userController.php'; // Include user controller f
 session_start(); // Démarre la session
 
 // Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../../../view/front_office/login.html"); // Rediriger vers la page de connexion si non connecté
-    exit();
-}
+
 
 $db = (new Database())->getConnection();
 ob_end_clean();
@@ -22,6 +19,32 @@ $users = getAllUsers($db, $search);
 <!DOCTYPE html>
 < lang="en">
   <head>
+    <style>
+      .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.pagination-button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.pagination-button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination-button:hover {
+    background-color: #e2e6ea;
+}
+
+    </style>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -59,8 +82,7 @@ $users = getAllUsers($db, $search);
               <div class="input-group">
                 <div class="input-group-prepend bg-transparent">
                   <i class="input-group-text border-0 mdi mdi-magnify"></i>
-                </div>
-                <input type="text" class="form-control bg-transparent border-0" placeholder="Search products">
+   
               </div>
             </form>
           </div>
@@ -316,7 +338,7 @@ $users = getAllUsers($db, $search);
                 </ul>
               </div>
 
-              -->
+            
             
 
         <!-- Table Section -->
@@ -386,66 +408,156 @@ $users = getAllUsers($db, $search);
             <div class="card">
             <h4>User List</h4>
 
-            <?php if (!empty($users)): ?>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nom</th>
-                                <th>Prénom</th>
-                                <th>Email</th>
-                                <th>Password</th>
-                                <th>Role</th>
-                                <th>Address</th>
-                                <th>Nationality</th>
-                                <th>Date of Birth</th>
-                                <th>Phone</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($users as $user): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($user['id_user']) ?></td>
-                                    <td><?= htmlspecialchars($user['nom']) ?></td>
-                                    <td><?= htmlspecialchars($user['prenom']) ?></td>
-                                    <td><?= htmlspecialchars($user['usermail']) ?></td>
-                                    <td><?= '********' ?></td> <!-- Always show 8 dots for the password -->
-                                    <td><?= htmlspecialchars($user['userRole']) ?></td>
-                                    <td><?= htmlspecialchars($user['adress']) ?></td>
-                                    <td><?= htmlspecialchars($user['Nationalite']) ?></td>
-                                    <td><?= htmlspecialchars($user['ddn']) ?></td>
-                                    <td><?= htmlspecialchars($user['num']) ?></td>
-                                    <td>
-                                        <form method="POST" action="../../controller/userController.php" style="display:inline;">
-    <input type="hidden" name="action" value="delete">
-    <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
-    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-</form>
+      
 
-                                        
-                                        <form method="POST" action="/dolicha/view/front_office/signup.html"    style="display:;">
-                                            <input type="hidden" name="action" value="add">
-                                            <button type="submit" class="btn btn-success">Add User</button>
-                                        </form>
-
-                                        <form method="GET" action=" /dolicha/view/back_office/pages/forms/basic_elements.php" style="display:inline;">
-                                            <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
-                                            <button type="submit" class="btn btn-warning">Edit</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <p>No users found.</p>
-            <?php endif; ?>
+        <!-- Barre de recherche -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <input type="text" id="searchInput" placeholder="Rechercher un utilisateur..." style="width: 80%; padding: 10px; font-size: 16px; border: 1px solid #ddd;">
         </div>
-    </div>
+
+        <div class="filter-container">
+    <label for="roleFilter">Filtrer par rôle :</label>
+    <select id="roleFilter">
+        <option value="all">Tous</option>
+        <option value="User">User</option>
+        <option value="Admin">Admin</option>
+        <option value="Vendeur">Vendeur</option>
+    </select>
 </div>
+
+<div class="table-responsive">
+    <table class="table" id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Role</th>
+                <th>Address</th>
+                <th>Nationality</th>
+                <th>Date of Birth</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $user): ?>
+                <tr data-role="<?= htmlspecialchars($user['userRole']) ?>">
+                    <td><?= htmlspecialchars($user['id_user']) ?></td>
+                    <td data-name="<?= htmlspecialchars($user['nom']) ?>"><?= htmlspecialchars($user['nom']) ?></td>
+                    <td><?= htmlspecialchars($user['prenom']) ?></td>
+                    <td><?= htmlspecialchars($user['usermail']) ?></td>
+                    <td><?= '********' ?></td>
+                    <td><?= htmlspecialchars($user['userRole']) ?></td>
+                    <td><?= htmlspecialchars($user['adress']) ?></td>
+                    <td><?= htmlspecialchars($user['Nationalite']) ?></td>
+                    <td><?= htmlspecialchars($user['ddn']) ?></td>
+                    <td><?= htmlspecialchars($user['num']) ?></td>
+                    <td>
+                        <form method="POST" action="../../controller/userController.php" style="display:inline;">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+
+                        <form method="POST" action="/dolicha/view/front_office/signup.php" style="display:">
+                            <input type="hidden" name="action" value="add">
+                            <button type="submit" class="btn btn-success">Add User</button>
+                        </form>
+
+                        <form method="GET" action="/dolicha/view/back_office/pages/forms/basic_elements.php" style="display:inline;">
+                            <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
+                            <button type="submit" class="btn btn-warning">Edit</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <div id="pagination" class="pagination"></div>
+</div>
+
+
+<!-- JavaScript pour la recherche dynamique -->
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#userTable tbody tr');
+
+        rows.forEach(row => {
+            const nom = row.querySelector('td[data-name]').textContent.toLowerCase();
+            if (nom.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    document.getElementById('roleFilter').addEventListener('change', function() {
+    const selectedRole = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#userTable tbody tr');
+
+    rows.forEach(row => {
+        const role = row.getAttribute('data-role').toLowerCase();
+        if (selectedRole === 'all' || role === selectedRole) {
+            row.style.display = ''; // Affiche la ligne
+        } else {
+            row.style.display = 'none'; // Cache la ligne
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
+    const rowsPerPage = 5; // Nombre de lignes par page
+    const table = document.getElementById('userTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const pagination = document.getElementById('pagination');
+
+    function displayPage(pageNumber) {
+        const start = (pageNumber - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        rows.forEach((row, index) => {
+            row.style.display = index >= start && index < end ? '' : 'none';
+        });
+    }
+
+    function createPaginationButtons(totalRows, rowsPerPage) {
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+        pagination.innerHTML = ''; // Réinitialise les boutons
+
+        for (let i = 1; i <= totalPages; i++) {
+            const button = document.createElement('button');
+            button.textContent = i;
+            button.classList.add('pagination-button');
+            button.addEventListener('click', () => {
+                displayPage(i);
+                setActiveButton(i);
+            });
+            pagination.appendChild(button);
+        }
+
+        // Afficher la première page au chargement
+        if (totalPages > 0) {
+            displayPage(1);
+            setActiveButton(1);
+        }
+    }
+
+    function setActiveButton(activePage) {
+        const buttons = pagination.querySelectorAll('.pagination-button');
+        buttons.forEach(button => {
+            button.classList.toggle('active', button.textContent == activePage);
+        });
+    }
+
+    // Initialisation
+    createPaginationButtons(rows.length, rowsPerPage);
+});
+
+</script>
 
             
             

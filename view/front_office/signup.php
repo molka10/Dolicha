@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -113,23 +115,24 @@
       text-decoration: underline;
     }
   </style>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 <section>
   <div class="form-box">
+    <h2>Sign Up</h2>
     <form method="POST" action="../../controller/userController.php" onsubmit="return validateForm()">
       <input type="hidden" name="action" value="signup">
-       
+
       <div class="inputbox">
         <input type="text" name="nom" id="nom" >
-        <label for="Nom">Nom</label>
+        <label for="nom">Nom</label>
       </div>
 
       <div class="inputbox">
-        <div class="inputbox">
-          <input type="text" name="prenom" id="prenom" >
-          <label for="Prenom">Prenom</label>
-        </div>
+        <input type="text" name="prenom" id="prenom">
+        <label for="prenom">Prénom</label>
+      </div>
 
       <div class="inputbox">
         <input type="email" name="usermail" id="usermail" >
@@ -148,10 +151,10 @@
 
       <div class="inputbox">
         <select name="userRole" id="userRole">
-            <option value="">-- Choisir un rôle --</option>
-            <option value="admin">Admin</option>
-            <option value="user">Utilisateur</option>
-            <option value="vendeur">Vendeur</option>
+          <option value="">-- Choisir un rôle --</option>
+          <option value="admin">Admin</option>
+          <option value="user">Utilisateur</option>
+          <option value="vendeur">Vendeur</option>
         </select>
         <label for="userRole">Rôle</label>
       </div>
@@ -176,7 +179,9 @@
         <label for="num">Numéro de téléphone</label>
       </div>
 
-      <button type="submit">S'inscrire</button>
+      <div class="g-recaptcha" id="g-recaptcha" data-sitekey="6LcGKZoqAAAAAFreDYO5bBpz6w5huCbwr0t49s3F" data-callback="enableSubmitBtn"></div>
+
+      <button type="submit" id="mySubmitBtn" name="btn" disabled>S'inscrire</button>
 
       <div class="login">
         <p>Already have an account? <a href="login.html">Log In</a></p>
@@ -184,12 +189,16 @@
     </form>
   </div>
 </section>
-
 <script>
+  // Activer le bouton submit une fois le reCAPTCHA validé
+  function enableSubmitBtn() {
+    document.getElementById("mySubmitBtn").disabled = false;
+  }
+
+  // Valider le formulaire
   function validateForm() {
     var nom = document.getElementById("nom").value.trim();
-    var prenom = document.getElementById("prenom").value.trim(); 
-
+    var prenom = document.getElementById("prenom").value.trim();
     var email = document.getElementById("usermail").value.trim();
     var password = document.getElementById("password").value;
     var confirmPassword = document.getElementById("confirmPassword").value;
@@ -198,63 +207,82 @@
     var nationality = document.getElementById("Nationalite").value.trim();
     var birthDate = document.getElementById("ddn").value;
     var phone = document.getElementById("num").value.trim();
+    var recaptchaResponse = document.getElementById("g-recaptcha-response").value;
 
     var errorMessage = "";
     var isValid = true;
 
-    // Validation de l'email
-    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(email)) {
-      errorMessage += "• Email invalide.\n";
+    // Validation du champ Nom
+    if (nom.length < 2) {
+      errorMessage += "\u2022 Le champ Nom doit contenir au moins 2 caractères.\n";
       isValid = false;
     }
 
-    // Validation des mots de passe
+    // Validation du champ Prénom
+    if (prenom.length < 2) {
+      errorMessage += "\u2022 Le champ Prénom doit contenir au moins 2 caractères.\n";
+      isValid = false;
+    }
+
+    // Validation de l'email
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      errorMessage += "\u2022 Email invalide.\n";
+      isValid = false;
+    }
+
+    // Validation du mot de passe
     if (password.length < 6) {
-      errorMessage += "• Le mot de passe doit contenir au moins 6 caractères.\n";
+      errorMessage += "\u2022 Le mot de passe doit contenir au moins 6 caractères.\n";
       isValid = false;
     }
     if (password !== confirmPassword) {
-      errorMessage += "• Les mots de passe ne correspondent pas.\n";
+      errorMessage += "\u2022 Les mots de passe ne correspondent pas.\n";
       isValid = false;
     }
 
     // Validation du rôle
     if (role === "") {
-      errorMessage += "• Sélectionnez un rôle.\n";
+      errorMessage += "\u2022 Veuillez sélectionner un rôle.\n";
       isValid = false;
     }
 
     // Validation de l'adresse
     if (address.length < 3) {
-      errorMessage += "• Adresse trop courte.\n";
+      errorMessage += "\u2022 Adresse trop courte.\n";
       isValid = false;
     }
 
     // Validation de la nationalité
     if (nationality.length < 3) {
-      errorMessage += "• Nationalité invalide.\n";
+      errorMessage += "\u2022 Nationalité invalide.\n";
       isValid = false;
     }
 
     // Validation de la date de naissance
     if (!birthDate) {
-      errorMessage += "• Entrez une date valide.\n";
+      errorMessage += "\u2022 Entrez une date valide.\n";
       isValid = false;
     }
 
     // Validation du numéro de téléphone
     var phonePattern = /^[0-9]{8,}$/;
     if (!phonePattern.test(phone)) {
-      errorMessage += "• Téléphone invalide (8 chiffres minimum).\n";
+      errorMessage += "\u2022 Numéro de téléphone invalide (8 chiffres minimum).\n";
       isValid = false;
     }
 
-    if (!isValid) {
-      alert("Corrigez les erreurs :\n" + errorMessage);
+    // Validation du reCAPTCHA
+    if (!recaptchaResponse) {
+      errorMessage += "\u2022 Veuillez vérifier le reCAPTCHA.\n";
+      isValid = false;
     }
 
-    return isValid;
+    // Affichage des erreurs
+    if (!isValid) {
+      alert("Corrigez les erreurs suivantes :\n" + errorMessage);
+    }
+
+    return isValid; // Empêche la soumission si des erreurs sont détectées
   }
 </script>
-  
