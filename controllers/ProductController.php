@@ -127,18 +127,51 @@ class ProductController {
             return null;
         }
     }
-    public function getTopSellingProductsByStock($limit = 10) {
+    public function getTopSellingProductsByStock() {
         try {
-            $stmt = $this->pdo->prepare("SELECT Name, Stock FROM product ORDER BY Stock DESC LIMIT :limit");
-            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+            $query = "
+                SELECT p.Name AS productName, p.Stock AS stockLevel
+                FROM product p
+                ORDER BY p.Stock DESC
+                LIMIT 10;
+            ";
+            
+            $stmt = $this->pdo->prepare($query);
             $stmt->execute();
-            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            return $products;
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $result;  // Return top-selling products with their stock levels
         } catch (PDOException $e) {
             error_log("Error fetching top-selling products: " . $e->getMessage());
-            return [];
+            return []; // Return an empty array in case of error
         }
     }
+    public function getPriceDistributionForCategories($categoryIds) {
+        try {
+            $placeholders = implode(',', array_fill(0, count($categoryIds), '?')); // Create placeholders for prepared statement
+            $query = "
+                SELECT c.CategoryName, 
+                       MIN(p.Price) AS minPrice, 
+                       MAX(p.Price) AS maxPrice, 
+                       AVG(p.Price) AS avgPrice
+                FROM category c
+                JOIN product p ON c.ID_Category = p.ID_Category
+                WHERE c.ID_Category IN ($placeholders)
+                GROUP BY c.CategoryName;
+            ";
+            
+            // Prepare and execute the query
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($categoryIds);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $result;  // Return the result as an associative array
+        } catch (PDOException $e) {
+            error_log("Error fetching price distribution: " . $e->getMessage());
+            return []; // Return an empty array in case of error
+        }
+    }
+
     
     
 }
