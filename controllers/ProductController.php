@@ -127,6 +127,8 @@ class ProductController {
             return null;
         }
     }
+
+    
     /*public function getAllProducts($sortOption = 'name') {
     try {
         // Define the SQL ORDER BY clause based on the sort option

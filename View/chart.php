@@ -1,30 +1,27 @@
+
 <?php
 include '../db.php';
+include '../controllers/ProductController.php';
 include '../controllers/CategoryController.php';
 
-$controller = new CategoryController($pdo);
-$categories = $controller->getAllCategories();
-$stmt = $pdo->query("SELECT * FROM category");  
-$tab = $stmt->fetchAll(PDO::FETCH_ASSOC);
-if (!empty($tab)) {
-    
-    foreach ($tab as $category) {
-        ?>
-        <tr>
-            <td class="text-center"><?= $category['ID_Category']; ?></td>
-            <td><?= $category['CategoryName']; ?></td>
-            <td>
-                <a href="../view/edit.php?id=<?= $category['ID_Category']; ?>">Modifier</a>
-                <a href="../view/delete.php?id=<?= $category['ID_Category']; ?>">Supprimer</a>
-            </td>
-        </tr>
-        <?php
-    }
-} else {
-    echo "<tr><td colspan='3'>No categories found.</td></tr>";  
+// Initialize the controller
+$categoryController = new CategoryController($pdo);
+
+if (isset($_GET['type'])) {
+  header('Content-Type: application/json');
+
+  if ($_GET['type'] === 'stock') {
+      echo json_encode($categoryController->getStockDistributionByCategory());
+  } elseif ($_GET['type'] === 'product') {
+      echo json_encode($categoryController->getProductDistributionByCategory());
+  }
+  exit;
 }
+
 ?>
-?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -47,6 +44,26 @@ if (!empty($tab)) {
     <link rel="stylesheet" href="../assets/css/style.css">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="../assets/images/favicon.png" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .chart-container {
+            width: 80%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+
   </head>
   <body>
     <div class="container-scroller">
@@ -276,16 +293,14 @@ if (!empty($tab)) {
                 <span class="menu-title">Dashboard product</span>
               </a>
             </li>
-            
-            
-            
+           
             <li class="nav-item sidebar-user-actions">
               <div class="user-details">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
                     <div class="d-flex align-items-center">
                       <div class="sidebar-profile-img">
-                        <img src="../assets/images/faces/face28.png" alt="image">
+                        <img src="../../assets/images/faces/face28.png" alt="image">
                       </div>
                       <div class="sidebar-profile-text">
                         <p class="mb-1">Henry Klein</p>
@@ -303,7 +318,6 @@ if (!empty($tab)) {
                 </a>
               </div>
             </li>
-            
             <li class="nav-item sidebar-user-actions">
               <div class="sidebar-user-menu">
                 <a href="#" class="nav-link"><i class="mdi mdi-logout menu-icon"></i>
@@ -314,60 +328,110 @@ if (!empty($tab)) {
         </nav>
         <!-- partial -->
         <div class="main-panel">
-        <div class="main-panel">            
-            <!-- Begin Category List -->
-<div class="panel-header panel-header-lg">
-  <div class="canvas" id="bigDashboardChart"></div>
-</div>
-<div class="content">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card">
-        <table class="table">
-          <thead>
-            <tr>
-              <h5 class="card-category">Category List</h5>
-              <th class="text-center">ID</th>
-              <th>Category Name</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- PHP Loop to display data -->
-            <?php foreach ($tab as $category) { ?>
-              <tr>
-                <td class="text-center"><?= $category['ID_Category']; ?></td>
-                <td><?= $category['CategoryName']; ?></td>
-                <td>
-                  <a href="../view/edit.php?id=<?= $category['ID_Category']; ?>">Modifier</a>
-                  <a href="../view/delete.php?id=<?= $category['ID_Category']; ?>">Supprimer</a>
-                </td>
-              </tr>
-            <?php } ?>
-            <!-- End of PHP Loop -->
-          </tbody>
-        </table>
+  <div class="content-wrapper">
+    <div class="page-header">
+      <h3 class="page-title"> Pie Charts </h3>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">Charts</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Pie Charts</li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="row">
+      <!-- Stock Distribution Pie Chart -->
+      <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Stock Distribution by Category</h4>
+            <canvas id="stockChart" width="400" height="400"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Distribution Pie Chart -->
+      <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Product Distribution by Category</h4>
+            <canvas id="productChart" width="400" height="400"></canvas>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-<!-- End Category List -->
-<script>
-  
-  function showPreview(src) {
-    const modal = document.getElementById('imagePreviewModal');
-    const modalImage = document.getElementById('modalImage');
-    modalImage.src = src;
-    modal.style.display = 'flex';
-  }
 
-  
-  function closePreview() {
-    const modal = document.getElementById('imagePreviewModal');
-    modal.style.display = 'none';
-  }
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Fetch and render Stock Distribution Chart
+  fetch('chart.php?type=stock')
+    .then(response => response.json())
+    .then(data => {
+      const stockLabels = data.map(item => item.CategoryName);
+      const stockData = data.map(item => item.TotalStock);
+
+      const ctxStock = document.getElementById('stockChart').getContext('2d');
+      new Chart(ctxStock, {
+        type: 'pie',
+        data: {
+          labels: stockLabels,
+          datasets: [{
+            label: 'Stock Distribution',
+            data: stockData,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF5722'],
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+          }
+        }
+      });
+    })
+    .catch(error => console.error('Error fetching stock distribution data:', error));
+
+  // Fetch and render Product Distribution Chart
+  fetch('chart.php?type=product')
+    .then(response => response.json())
+    .then(data => {
+      const productLabels = data.map(item => item.CategoryName);
+      const productData = data.map(item => item.ProductCount);
+
+      const ctxProduct = document.getElementById('productChart').getContext('2d');
+      new Chart(ctxProduct, {
+        type: 'pie',
+        data: {
+          labels: productLabels,
+          datasets: [{
+            label: 'Product Distribution',
+            data: productData,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF5722'],
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+          }
+        }
+      });
+    })
+    .catch(error => console.error('Error fetching product distribution data:', error));
+});
 </script>
-</div>
+
+
+
+
+          <!-- content-wrapper ends -->
+          <!-- partial:../../partials/_footer.html -->
           <footer class="footer">
             <div class="footer-inner-wraper">
               <div class="d-sm-flex justify-content-center justify-content-sm-between">
@@ -384,19 +448,18 @@ if (!empty($tab)) {
     </div>
     <!-- container-scroller -->
     <!-- plugins:js -->
-    <script src="../assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
     <!-- endinject -->
     <!-- Plugin js for this page -->
-    <script src="../assets/vendors/chart.js/Chart.min.js"></script>
-    <script src="../assets/vendors/jquery-circle-progress/js/circle-progress.min.js"></script>
+    <script src="../../assets/vendors/chart.js/Chart.min.js"></script>
     <!-- End plugin js for this page -->
     <!-- inject:js -->
-    <script src="../assets/js/off-canvas.js"></script>
-    <script src="../assets/js/hoverable-collapse.js"></script>
-    <script src="../assets/js/misc.js"></script>
+    <script src="../../assets/js/off-canvas.js"></script>
+    <script src="../../assets/js/hoverable-collapse.js"></script>
+    <script src="../../assets/js/misc.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page -->
-    <script src="../assets/js/dashboard.js"></script>
+    <script src="../../assets/js/chart.js"></script>
     <!-- End custom js for this page -->
   </body>
 </html>

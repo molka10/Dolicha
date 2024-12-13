@@ -9,7 +9,7 @@ class CategoryController {
         $this->pdo = $pdo;
     }
 
-    
+   
     public function createCategory($categoryName) {
         try {
             $stmt = $this->pdo->prepare("INSERT INTO category (CategoryName) VALUES (:categoryName)");
@@ -90,6 +90,39 @@ class CategoryController {
             return null;
         }
     }
+    public function getStockDistributionByCategory() {
+        try {
+            $sql = "
+                SELECT c.CategoryName, SUM(p.Stock) AS TotalStock
+                FROM category c
+                JOIN product p ON c.ID_Category = p.ID_Category
+                GROUP BY c.CategoryName
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching stock distribution: " . $e->getMessage());
+            return [];
+        }
+    }
+    public function getProductDistributionByCategory() {
+        try {
+            $sql = "
+                SELECT c.CategoryName, COUNT(p.ID_Product) AS ProductCount
+                FROM category c
+                LEFT JOIN product p ON c.ID_Category = p.ID_Category
+                GROUP BY c.CategoryName
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching product distribution: " . $e->getMessage());
+            return [];
+        }
+    }
+    
 }
 
 ?>
