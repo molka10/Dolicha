@@ -1,7 +1,7 @@
 <?php
-include '../db.php';
-include '../models/Product.php';
-
+include 'C:\xampp\htdocs\produit\dolicha\config.php';
+include 'C:\xampp\htdocs\produit\dolicha\models\Product.php';
+include 'C:\xampp\htdocs\produit\dolicha\libs\tcpdf\tcpdf.php';
 class ProductController {
     private $pdo;
 
@@ -234,6 +234,65 @@ class ProductController {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function generatePDF($categoryId) {
+        // Create new PDF document
+        $pdf = new TCPDF();
+        $pdf->SetCreator('E-Commerce Admin');
+        $pdf->SetTitle('Product Catalog');
+    
+        // Add a new page
+        $pdf->AddPage();
+    
+        // Fetch data
+        $categoryName = $this->getCategoryNameById($categoryId);
+        if (!$categoryName) {
+            $pdf->SetFont('helvetica', '', 12);
+            $pdf->Cell(0, 10, "Category not found", 0, 1, 'C');
+            $pdf->Output('Product_Catalog.pdf', 'D');
+            return;
+        }
+    
+        // Fetch products for this category
+        $products = $this->getAllProductsForCategory($categoryId);
+    
+        // Add header
+        $pdf->SetFont('helvetica', 'B', 16);
+        $pdf->Cell(0, 10, "Product Catalog: $categoryName", 0, 1, 'C');
+        $pdf->Ln(5);
+    
+        // Add table headers
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->Cell(30, 10, 'ID', 1);
+        $pdf->Cell(50, 10, 'Name', 1);
+        $pdf->Cell(30, 10, 'Price', 1);
+        $pdf->Cell(30, 10, 'Stock', 1);
+        $pdf->Ln();
+    
+        // Add product rows
+        $pdf->SetFont('helvetica', '', 10);
+        foreach ($products as $product) {
+            $pdf->Cell(30, 10, $product['ID_Product'], 1);
+            $pdf->Cell(50, 10, $product['Name'], 1);
+            $pdf->Cell(30, 10, $product['Price'] . ' $', 1);
+            $pdf->Cell(30, 10, $product['Stock'], 1);
+            $pdf->Ln();
+        }
+    
+        // Output PDF for download
+        $pdf->Output('Product_Catalog.pdf', 'D');
+    }
+    
+    public function getAllProductsForCategory($categoryId) {
+        try {
+            $stmt = $this->pdo->prepare("SELECT ID_Product, Name, Price, Stock FROM product WHERE ID_Category = :categoryId");
+            $stmt->execute(['categoryId' => $categoryId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching products for category: " . $e->getMessage());
+            return [];
+        }
+    }
+    
     
     
 }

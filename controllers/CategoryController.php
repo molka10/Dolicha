@@ -1,5 +1,5 @@
 <?php
-include 'C:\xampp\htdocs\produit\dolicha\db.php';
+include 'C:\xampp\htdocs\produit\dolicha\config.php';
 include 'C:\xampp\htdocs\produit\dolicha\models\Category.php';
 
 class CategoryController {
