@@ -4,7 +4,7 @@ include '../db.php';
 include '../controllers/ProductController.php';
 include '../controllers/CategoryController.php';
 
-// Initialize the controller
+
 $categoryController = new CategoryController($pdo);
 if (isset($_GET['type'])) {
   header('Content-Type: application/json');
@@ -384,7 +384,7 @@ canvas {
 </div>
 
 <script>
-// Fetch Stock Distribution
+
 fetch('chart.php?type=stock')
   .then(response => response.json())
   .then(data => {
@@ -413,7 +413,7 @@ fetch('chart.php?type=stock')
     });
   });
 
-// Fetch Product Distribution
+
 fetch('chart.php?type=product')
   .then(response => response.json())
   .then(data => {

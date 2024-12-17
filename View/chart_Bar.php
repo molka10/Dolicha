@@ -4,9 +4,9 @@ include '../db.php';
 include '../controllers/ProductController.php';
 include '../controllers/CategoryController.php';
 
-$categoryIds = [11, 8, 7];  // Replace with the actual category IDs
-$productController = new ProductController($pdo); // Create an instance of the controller
-$priceDistributions = $productController->getPriceDistributionForCategories($categoryIds); // Get price distribution data for the categories
+$categoryIds = [11, 8, 7]; 
+$productController = new ProductController($pdo); 
+$priceDistributions = $productController->getPriceDistributionForCategories($categoryIds); 
 $topSellingProducts = $productController->getTopSellingProductsByStock();
 ?>
 
@@ -379,7 +379,7 @@ $topSellingProducts = $productController->getTopSellingProductsByStock();
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return value; // Show stock values
+                                return value; 
                             }
                         }
                     }
@@ -387,14 +387,14 @@ $topSellingProducts = $productController->getTopSellingProductsByStock();
             }
         });
 
-        // Prepare data for the price distribution charts (for each category)
+        
         var categories = <?php echo json_encode($priceDistributions); ?>;
         
         categories.forEach(function(distribution, index) {
             var labels = ['Min Price', 'Max Price', 'Avg Price'];
             var prices = [distribution.minPrice, distribution.maxPrice, distribution.avgPrice];
 
-            // Price Distribution per Category Chart
+            
             var ctx = document.getElementById('priceChart' + index).getContext('2d');
             var priceChart = new Chart(ctx, {
                 type: 'bar',

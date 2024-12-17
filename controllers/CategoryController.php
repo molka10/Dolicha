@@ -19,7 +19,7 @@ class CategoryController {
             echo "Error creating category: " . $e->getMessage();
             return null;
         }
-    }// getCategory
+    }
     public function getCategory($id) {
         $stmt = $this->pdo->prepare("SELECT * FROM category WHERE ID_Category = :id");
         $stmt->execute(['id' => $id]);
@@ -33,7 +33,7 @@ class CategoryController {
         }
     }
 
-    //getAllCategories
+    
     public function getAllCategories() {
         $stmt = $this->pdo->query("SELECT * FROM category");
         $categories = [];
@@ -61,7 +61,6 @@ class CategoryController {
 }
 
 
-    // deleteCategory
     public function deleteCategory($id) {
         try {
             
@@ -77,7 +76,7 @@ class CategoryController {
             echo "Error deleting category: " . $e->getMessage();
             return false;  
         }
-    }// getCategoryById
+    }
     public function getCategoryById($categoryId) {
         try {
             $stmt = $this->pdo->prepare("SELECT * FROM category WHERE ID_Category = :categoryId");
@@ -139,14 +138,6 @@ class CategoryController {
             return [];
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
     
 }
 

@@ -8,11 +8,19 @@ include '../controllers/CategoryController.php';
 $productController = new ProductController($pdo);
 $categoryController = new CategoryController($pdo);
 
-
+// Sorting and search setup
 $sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : null;
+$search = isset($_GET['search']) ? $_GET['search'] : null;
 
+$products = [];
 
-$products = $productController->getAllProducts($sortBy);
+if ($search) {
+    // If search is provided, use the search functionality
+    $products = $productController->searchProducts($search, $sortBy);
+} else {
+    // If no search, fetch all products
+    $products = $productController->getAllProducts($sortBy);
+}
 ?>
 
 
@@ -76,8 +84,8 @@ $products = $productController->getAllProducts($sortBy);
                 <div class="input-group-prepend bg-transparent">
                   <i class="input-group-text border-0 mdi mdi-magnify"></i>
                 </div>
-                <input type="text" class="form-control bg-transparent border-0" placeholder="Search products">
-              </div>
+                <input type="text" name="search" class="form-control bg-transparent border-0" placeholder="Search products" value="<?= htmlspecialchars($_GET['search'] ?? ''); ?>">
+                </div>
             </form>
           </div>
           <ul class="navbar-nav navbar-nav-right">
@@ -336,100 +344,80 @@ $products = $productController->getAllProducts($sortBy);
         <div class="canvas" id="bigDashboardChart"></div>
     </div>
     <div class="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-category">Product List</h5>
-                        
-                        <select id="sort_by" onchange="sortProducts()">
-                            <option value="">Sort by</option>
-                            <option value="LastEdited">Last Edited</option>
-                            <option value="Stock">Stock</option>
-                            <option value="Price">Price</option>
-                        </select>
-                    </div>
-                    <div class="card-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">ID</th>
-                                    <th>Product Name</th>
-                                    <th>Price</th>
-                                    <th>Stock</th>
-                                    <th>Category</th>
-                                    <th>Image</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($products)) { ?>
-                                    <?php foreach ($products as $product) { ?>
-                                        <tr>
-                                            <td class="text-center"><?= htmlspecialchars($product->getId()); ?></td>
-                                            <td><?= htmlspecialchars($product->getName()); ?></td>
-                                            <td><?= htmlspecialchars($product->getPrice()); ?> USD</td>
-                                            <td><?= htmlspecialchars($product->getStock()); ?></td>
-                                            <td>
-                                                <?php 
-                                                
-                                                $category = $categoryController->getCategoryById($product->getIdCategory());
-                                                echo $category ? htmlspecialchars($category['CategoryName']) : 'Unknown';
-                                                ?>
-                                            </td>
-                                            <td>
-                                                <?php 
-                                                
-                                                if (!empty($product->getImage())) {
-                                                    echo "<img src='../uploads/" . htmlspecialchars($product->getImage()) . "' alt='" . htmlspecialchars($product->getName()) . "' class='product-image' onclick='showPreview(\"../uploads/" . htmlspecialchars($product->getImage()) . "\")' style='cursor: pointer;'>";
-                                                } else {
-                                                    echo "No image available";
-                                                }
-                                                ?>
-                                            </td>
-                                            <td>
-                                                <a href="../view/edit_product.php?id=<?= htmlspecialchars($product->getId()); ?>">Edit</a> |
-                                                <a href="../view/delete_product.php?id=<?= htmlspecialchars($product->getId()); ?>" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
-                                            </td>
-                                        </tr>
-                                    <?php } ?>
-                                <?php } else { ?>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-category">Product List</h5>
+
+                    <!-- Sort Dropdown -->
+                    <select id="sort_by" onchange="sortProducts()">
+                        <option value="">Sort by</option>
+                        <option value="LastEdited" <?= $sortBy == 'LastEdited' ? 'selected' : ''; ?>>Last Edited</option>
+                        <option value="Stock" <?= $sortBy == 'Stock' ? 'selected' : ''; ?>>Stock</option>
+                        <option value="Price" <?= $sortBy == 'Price' ? 'selected' : ''; ?>>Price</option>
+                    </select>
+                </div>
+
+                <!-- Product Table -->
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">ID</th>
+                                <th>Product Name</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Category</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($products)) { ?>
+                                <?php foreach ($products as $product) { ?>
                                     <tr>
-                                        <td colspan="7" class="text-center">No products found.</td>
+                                        <td class="text-center"><?= htmlspecialchars($product->getId()); ?></td>
+                                        <td><?= htmlspecialchars($product->getName()); ?></td>
+                                        <td><?= htmlspecialchars($product->getPrice()); ?> USD</td>
+                                        <td><?= htmlspecialchars($product->getStock()); ?></td>
+                                        <td>
+                                            <?php
+                                            $category = $categoryController->getCategoryById($product->getIdCategory());
+                                            echo $category ? htmlspecialchars($category['CategoryName']) : 'Unknown';
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            if (!empty($product->getImage())) {
+                                                echo "<img src='../uploads/" . htmlspecialchars($product->getImage()) . "' alt='" . htmlspecialchars($product->getName()) . "' class='product-image' onclick='showPreview(\"../uploads/" . htmlspecialchars($product->getImage()) . "\")' style='cursor: pointer;'>";
+                                            } else {
+                                                echo "No image available";
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <a href="../view/edit_product.php?id=<?= htmlspecialchars($product->getId()); ?>">Edit</a> |
+                                            <a href="../view/delete_product.php?id=<?= htmlspecialchars($product->getId()); ?>" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                                        </td>
                                     </tr>
                                 <?php } ?>
-                            </tbody>
-                        </table>
-                    </div>
+                            <?php } else { ?>
+                                <tr>
+                                    <td colspan="7" class="text-center">No products found.</td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    
-    <div id="imagePreviewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0, 0, 0, 0.7); justify-content:center; align-items:center;">
-        <span onclick="closePreview()" style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer;">&times;</span>
-        <img id="modalImage" style="max-width:90%; max-height:90%; object-fit:contain;" src="" alt="Image Preview">
-    </div>
-
-    <script>
-        
-        function showPreview(src) {
-            const modal = document.getElementById('imagePreviewModal');
-            const modalImage = document.getElementById('modalImage');
-            modalImage.src = src;
-            modal.style.display = 'flex';
-        }
-
-        
-        function closePreview() {
-            const modal = document.getElementById('imagePreviewModal');
-            modal.style.display = 'none';
-        }
-
-        
-        function sortProducts() {
-            const sortBy = document.getElementById('sort_by').value;
-            window.location.href = "?sort_by=" + sortBy;  
-        }
-    </script>
+<script>
+    function sortProducts() {
+        const sortBy = document.getElementById('sort_by').value;
+        window.location.href = "index_product.php?sort_by=" + sortBy + "&search=<?= htmlspecialchars($search); ?>";
+    }
+</script>
