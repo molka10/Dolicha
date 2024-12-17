@@ -132,7 +132,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'Success';
 
         <div class="actions">
             <a href="insurance.php">Go to Home</a>
-            <a href="affichepanier.php">View My Orders</a>
+            <a href="affichecommande.php">View My Orders</a>
         </div>
     </div>
 
