@@ -29,9 +29,14 @@ class CommandeController {
 
     // New method to get all commandes
     public function getAllCommandes() {
-        $sql = "SELECT * FROM commande"; // Adjust if you want specific fields
+        $sql = "SELECT * FROM commande WHERE iduser = 1;"; // Adjust if you want specific fields
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function deleteCommande($id) {
+        $stmt = $this->pdo->prepare("DELETE FROM commande WHERE idcommande = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
     }
 }
