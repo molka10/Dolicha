@@ -1,29 +1,67 @@
 <?php
 // Include necessary files
-require_once 'C:\xampp\htdocs\dolicha0.2\controller\cartController.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\comandeController.php'; // Corrected to lowercase 'c'
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 
 // Create a new PDO instance
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=dolicha0.2', 'root', '');
+    $pdo = new PDO('mysql:host=localhost;dbname=dolicha0.2', 'root', ''); // Adjust these values as needed
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     echo "Connection failed: " . $e->getMessage();
+    exit; // Stop execution if the connection fails
+}
+
+// Create a new CommandeController object
+$commandeController = new CommandeController($pdo);
+
+// Check if the ID is set in the URL
+if (isset($_GET['id'])) {
+    $idcommande = $_GET['id'];
+    $commande = $commandeController->getCommandeById($idcommande);
+
+    if (!$commande) {
+        echo "Commande not found.";
+        exit;
+    }
+} else {
+    echo "No ID provided.";
     exit;
 }
 
-// Create a new CartController object
-$cartController = new PanierController($pdo);
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the form values
+    $iduser = $_POST['iduser'];
+    $idpanier = $_POST['idpanier'];
+    $date = $_POST['date'];
+    $status = $_POST['status'];
 
-// Check if the cart ID is set in the URL
-if (isset($_GET['id'])) {
-    $Idpanier = $_GET['id'];
-    // ... rest of your code
-   // Fetch products associated with the cart
-    $products = $cartController->getProductsByCartId($Idpanier);
-} else {
-    echo "No cart ID provided!";
-    exit;
+    // Check the status and delete if 'Not Confirmed'
+    if ($status == 0) { // Assuming 0 means 'Not Confirmed'
+        $sql = "DELETE FROM commande WHERE idcommande = :idcommande";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['idcommande' => $idcommande]);
+
+        // Redirect to affichecommande.php after deletion
+        header("Location: affichecommande.php");
+        exit;
+    } else {
+        // Update the commande in the database
+        $sql = "UPDATE commande SET iduser = :iduser, idpanier = :idpanier, date = :date, status = :status WHERE idcommande = :idcommande";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            'iduser' => $iduser,
+            'idpanier' => $idpanier,
+            'date' => $date,
+            'status' => $status,
+            'idcommande' => $idcommande
+        ]);
+
+        // Redirect to affichecommande.php after update
+        header("Location: affichecommande.php");
+        exit;
+    }
 }
 ?>
 
@@ -189,38 +227,78 @@ if (isset($_GET['id'])) {
         <div class="container">
             <div class="row d-flex align-items-center justify-content-center">
                 <div class="about-content col-lg-12">
-                    <h1 class="text-white">View All Carts</h1>
-                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="insurance.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichepanier.php"> View all carts</a></p>
+                    <h1 class="text-white">Commande</h1>
+                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="insurance.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichecommande.php">Commande</a></p>
                 </div>
             </div>
         </div>
     </section>
-    <h1>Products in Cart ID: <?php echo htmlspecialchars($Idpanier); ?></h1>
-    
-    <!-- Display the product information -->
-    <table>
-        <thead>
-            <tr>
-                <th>Produit</th>
-                <th>Quantity</th>
-            </tr>
-        </thead>
-        <tbody>
-    <?php if (!empty($products)): ?>
-        <?php foreach ($products as $product): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($product['nom']); ?></td> <!-- Display product name -->
-                <td><?php echo htmlspecialchars($product['quantity']); ?></td>
-            </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <tr>
-            <td colspan="2">No products found for this cart.</td>
-        </tr>
-    <?php endif; ?>
-</tbody>
-    </table>
-    
-    <a href="affichepanier.php">Back to All Carts</a>
+    <title>Update Commande</title>
+</head>
+<body>
+<div class="container">
+    <h1>Update Commande</h1>
+    <form method="POST" onsubmit="return validateDate();">
+        <div class="form-group">
+            <label for="iduser">ID User</label>
+            <input type="text" class="form-control" id="iduser" name="iduser" value="<?php echo htmlspecialchars($commande->getIduser()); ?>" >
+        </div>
+        <div class="form-group">
+            <label for="idpanier">ID Panier</label>
+            <input type="text" class="form-control" id="idpanier" name="idpanier" value="<?php echo htmlspecialchars($commande->getIdpanier()); ?>" >
+        </div>
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" class="form-control" id="date" name="date" value="<?php echo htmlspecialchars($commande->getDate()->format('Y-m-d')); ?>"  max="<?php echo date('Y-m-d'); ?>">
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status" required>
+                <option value="0" <?php echo $commande->getStatus() == 0 ? 'selected' : ''; ?>>Not Confirmed</option>
+                <option value="1" <?php echo $commande->getStatus() == 1 ? 'selected' : ''; ?>>Confirmed</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+
+<script src="js/vendor/jquery-2.2.4.min.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Store original values for ID fields
+        const idUser = document.getElementById('iduser');
+        const idPanier = document.getElementById('idpanier');
+        const originalIdUserValue = idUser.value;
+        const originalIdPanierValue = idPanier.value;
+
+        // Prevent modification of ID User
+        idUser.addEventListener('input', function() {
+            idUser.value = originalIdUserValue; // Revert to original if changed
+        });
+
+        // Prevent modification of ID Panier
+        idPanier.addEventListener('input', function() {
+            idPanier.value = originalIdPanierValue; // Revert to original if changed
+        });
+    });
+
+    function validateDate() {
+        const dateInput = document.getElementById('date');
+        const selectedDate = new Date(dateInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set time to midnight for comparison
+
+        if (selectedDate < today) {
+            alert('Please select a date that is today or in the future.');
+            dateInput.value = ''; // Clear the invalid input
+            dateInput.focus(); // Set focus back to the date input
+            return false; // Prevent form submission
+        }
+        return true; // Allow form submission
+    }
+</script>
+    <script src="js/vendor/jquery-2.2.4.min.js"></script>
+    <script src="js/vendor/bootstrap.min.js"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'C:\xampp\htdocs\dolicha0.2\controller\productController.php'; 
-require_once 'C:\xampp\htdocs\dolicha0.2\controller\cartController.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\productController.php'; 
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\cartController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 
 if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {

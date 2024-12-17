@@ -1,6 +1,6 @@
 <?php
 // Include necessary files
-require_once 'C:\xampp\htdocs\dolicha0.2\controller\ComandeController.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\ComandeController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 
 try {
