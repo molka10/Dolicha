@@ -124,7 +124,7 @@ $products = $productController->getAllProducts();
                             echo '
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="single-product">
-                                    <img src="kasbah-of-hammamet.jpg" alt="' . htmlspecialchars($product->getNom()) . '" class="img-fluid">
+                                    <img src="kasbah-of-hammamet.jpg" alt="' . htmlspecialchars($product->getName()) . '" class="img-fluid">
                                     <h3 class="product-name">' . htmlspecialchars($product->getNom()) . '</h3>
                                     <p class="product-description">Experience the best of ' . htmlspecialchars($product->getNom()) . '!</p>
                                     <span class="product-price">$' . htmlspecialchars($product->getPrix()) . '</span>
@@ -171,15 +171,7 @@ function validateQuantity(form) {
     <script src="js/jquery.sticky.js"></script>
     <script src="js/main.js"></script>
     <script>
-// Validate quantity function remains the same
-function validateQuantity(form) {
-    const quantity = form.quantity.value;
-    if (quantity <= 0) {
-        alert('Please enter a valid quantity greater than zero.');
-        return false; // Prevent form submission
-    }
-    return true; // Allow form submission
-}
+
 
 // Add event listener for all forms with the class 'addToCartForm'
 document.querySelectorAll('.addToCartForm').forEach(form => {

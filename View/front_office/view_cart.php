@@ -149,7 +149,7 @@ $total = 0;
                         <li><a href="about.html">About</a></li>
                         <li><a href="packages.html">Packages</a></li>
                         <li><a href="hotels.html">Hotels</a></li>
-                        <li><a href="insurance.html">Insurance</a></li>
+                        <li><a href="indexp.php">Products</a></li>
                         <li class="menu-has-children"><a href="">Blog</a>
                             <ul>
                                 <li><a href="blog-home.html">Blog Home</a></li>
@@ -188,7 +188,7 @@ $total = 0;
                     <p class="text-white link-nav" style="font-size: 1.2rem;">
                         <a href="index.html" class="text-white">Home </a>  
                         <span class="lnr lnr-arrow-right"></span>  
-                        <a href="insurance.php" class="text-white"> Products</a> 
+                        <a href="indexp.php" class="text-white"> Products</a> 
                         <span class="lnr lnr-arrow-right"></span>  
                         <a href="view_cart.php" class="text-white"> View cart</a>
                     </p>
@@ -200,33 +200,35 @@ $total = 0;
     <div class="container">
         <h1 class="cart-title">Votre Panier</h1>
         <div class="cart-items">
-            <?php foreach ($cart as $productId => $quantity): ?>
-                <?php
-                $product = $productController->getProductById($productId);
-                if ($product === null) {
-                    echo '<div class="cart-item">Produit introuvable (ID: ' . htmlspecialchars($productId) . ').</div>';
-                    continue;
-                }
-                $subtotal = $product->getPrix() * $quantity;
-                $total += $subtotal;
-                ?>
-                <div class="cart-item">
-                    <div class="item-info">
-                        <div class="item-name"><?php echo htmlspecialchars($product->getNom()); ?></div>
-                        <div class="item-price"><?php echo htmlspecialchars($product->getPrix()); ?> $</div>
-                        <div class="item-quantity">Quantité: <?php echo htmlspecialchars($quantity); ?></div>
-                        <div class="item-subtotal">Sous-total: <?php echo htmlspecialchars($subtotal); ?> $</div>
-                    </div>
-                    <div class="item-action">
-                        <form action="remove_from_cart.php" method="post">
-                            <input type="hidden" name="productId" value="<?php echo $productId; ?>">
-                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Supprimer</button>
-                        </form>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+        <?php foreach ($cart as $productId => $quantity): ?>
+    <?php
+    $product = $productController->getProductById($productId);
+    if ($product === null) {
+        echo '<div class="cart-item">Produit introuvable (ID: ' . htmlspecialchars($productId) . ').</div>';
+        continue;
+    }
+    // Use object properties here
+    $subtotal = $product->getPrice() * $quantity;
+    $total += $subtotal;
+    ?>
+    <div class="cart-item">
+        <div class="item-info">
+            <div class="item-name"><?php echo htmlspecialchars($product->getName()); ?></div>
+            <div class="item-price"><?php echo htmlspecialchars($product->getPrice()); ?> $</div>
+            <div class="item-quantity">Quantité: <?php echo htmlspecialchars($quantity); ?></div>
+            <div class="item-subtotal">Sous-total: <?php echo htmlspecialchars($subtotal); ?> $</div>
         </div>
-        <h3 class="total">Total: <?php echo $total; ?> $</h3>
+        <div class="item-action">
+            <form action="remove_from_cart.php" method="post">
+                <input type="hidden" name="productId" value="<?php echo $productId; ?>">
+                <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Supprimer</button>
+            </form>
+        </div>
+    </div>
+<?php endforeach; ?>
+
+</div>
+<h3 class="total">Total: <?php echo $total; ?> $</h3>
         <form action="confirm_cart.php" method="post">
             <button type="submit" class="btn btn-success">Confirmer le Panier</button>
         </form>

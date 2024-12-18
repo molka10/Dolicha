@@ -2,6 +2,7 @@
 // Include necessary files
 require_once 'comandeController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\CategoryController.php';
 
 // Create a new PDO instance
 try {
@@ -17,6 +18,31 @@ $commandeController = new CommandeController($pdo);
 
 // Fetch all commandes using the CommandeController
 $commandes = $commandeController->getAllCommandes();
+
+
+
+$controller = new CategoryController($pdo);
+$categories = $controller->getAllCategories();
+$stmt = $pdo->query("SELECT * FROM category");  
+$tab = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if (!empty($tab)) {
+    
+    foreach ($tab as $category) {
+        ?>
+        <tr>
+            <td class="text-center"><?= $category['ID_Category']; ?></td>
+            <td><?= $category['CategoryName']; ?></td>
+            <td>
+                <a href="../back_office/edit.php?id=<?= $category['ID_Category']; ?>">Modifier</a>
+                <a href="../back_office/delete.php?id=<?= $category['ID_Category']; ?>">Supprimer</a>
+            </td>
+        </tr>
+        <?php
+    }
+} else {
+    echo "<tr><td colspan='3'>No categories found.</td></tr>";  
+}
+?>
 ?>
 
 <!DOCTYPE html>
@@ -368,73 +394,42 @@ tr:hover {
           <ul class="nav">
             <li class="nav-item nav-category">Main</li>
             <li class="nav-item">
-              <a class="nav-link" href="index.php">
+            <a class="nav-link" href="index.php">
                 <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-                <span class="menu-title">Dashboard</span>
+                <span class="menu-title">Dashboard category</span>
               </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-                <span class="icon-bg"><i class="mdi mdi-crosshairs-gps menu-icon"></i></span>
-                <span class="menu-title">UI Elements</span>
-                <i class="menu-arrow"></i>
+              <a class="nav-link" href="create.php">
+                <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+                <span class="menu-title">creat category</span>
               </a>
-              <div class="collapse" id="ui-basic">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="pages/ui-features/buttons.html">Buttons</a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/ui-features/dropdowns.html">Dropdowns</a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/ui-features/typography.html">Typography</a></li>
-                </ul>
-              </div>
-            </li>
+            
             <li class="nav-item">
-              <a class="nav-link" href="pages/icons/mdi.html">
-                <span class="icon-bg"><i class="mdi mdi-contacts menu-icon"></i></span>
-                <span class="menu-title">Icons</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="pages/forms/basic_elements.html">
+              <a class="nav-link" href="create_product.php">
                 <span class="icon-bg"><i class="mdi mdi-format-list-bulleted menu-icon"></i></span>
-                <span class="menu-title">Forms</span>
+                <span class="menu-title">create product</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="pages/charts/chartjs.html">
+              <a class="nav-link" href="chart.php">
                 <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
                 <span class="menu-title">Charts</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="pages/tables/basic-table.html">
-                <span class="icon-bg"><i class="mdi mdi-table-large menu-icon"></i></span>
-                <span class="menu-title">Tables</span>
+              <a class="nav-link" href="chart_Bar.php">
+                <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
+                <span class="menu-title">Bar Charts</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-                <span class="icon-bg"><i class="mdi mdi-lock menu-icon"></i></span>
-                <span class="menu-title">User Pages</span>
-                <i class="menu-arrow"></i>
-              </a>
-              <div class="collapse" id="auth">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/blank-page.html"> Blank Page </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html"> 404 </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> 500 </a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item documentation-link">
-              <a class="nav-link" href="http://www.bootstrapdash.com/demo/connect-plus-free/jquery/documentation/documentation.html" target="_blank">
-                <span class="icon-bg">
-                  <i class="mdi mdi-file-document-box menu-icon"></i>
-                </span>
-                <span class="menu-title">Documentation</span>
+              <a class="nav-link" href="index_product.php">
+                <span class="icon-bg"><i class="mdi mdi-table-large menu-icon"></i></span>
+                <span class="menu-title">Dashboard product</span>
               </a>
             </li>
+            
+            
+            
             <li class="nav-item sidebar-user-actions">
               <div class="user-details">
                 <div class="d-flex justify-content-between align-items-center">
@@ -793,7 +788,7 @@ if ($action === 'edit' && $id) {
             border: none;
             border-radius: 3px;
             cursor: pointer;
-            color: white;
+            color: black;
         }
         .edit-btn {
             background-color: #007bff;
@@ -960,6 +955,57 @@ if ($action === 'edit' && $id) {
               </div>
             </div>
           </div>
+          <div class="panel-header panel-header-lg">
+  <div class="canvas" id="bigDashboardChart"></div>
+</div>
+<div class="content">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <table class="table">
+          <thead>
+            <tr>
+              <h5 class="card-category">Category List</h5>
+              <th class="text-center">ID</th>
+              <th>Category Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- PHP Loop to display data -->
+            <?php foreach ($tab as $category) { ?>
+              <tr>
+                <td class="text-center"><?= $category['ID_Category']; ?></td>
+                <td><?= $category['CategoryName']; ?></td>
+                <td>
+                  <a href="../back_office/edit.php?id=<?= $category['ID_Category']; ?>">Modifier</a>
+                  <a href="../back_office/delete.php?id=<?= $category['ID_Category']; ?>">Supprimer</a>
+                </td>
+              </tr>
+            <?php } ?>
+            <!-- End of PHP Loop -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Category List -->
+<script>
+  
+  function showPreview(src) {
+    const modal = document.getElementById('imagePreviewModal');
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = src;
+    modal.style.display = 'flex';
+  }
+
+  
+  function closePreview() {
+    const modal = document.getElementById('imagePreviewModal');
+    modal.style.display = 'none';
+  }
+</script>
           <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html -->
           <footer class="footer">

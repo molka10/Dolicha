@@ -146,7 +146,7 @@ $commandes = $commandeController->getAllCommandes();
                         <li><a href="about.html">About</a></li>
                         <li><a href="packages.html">Packages</a></li>
                         <li><a href="hotels.html">Hotels</a></li>
-                        <li><a href="insurance.html">Insurance</a></li>
+                        <li><a href="indexp.php">Products</a></li>
                         <li class="menu-has-children"><a href="">Blog</a>
                             <ul>
                                 <li><a href="blog-home.html">Blog Home</a></li>
@@ -181,7 +181,7 @@ $commandes = $commandeController->getAllCommandes();
             <div class="row d-flex align-items-center justify-content-center">
                 <div class="about-content col-lg-12">
                     <h1 class="text-white">Historique</h1>
-                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="insurance.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichecommande.php">Historique</a></p>
+                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="indexp.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichecommande.php">Historique</a></p>
                 </div>
             </div>
         </div>

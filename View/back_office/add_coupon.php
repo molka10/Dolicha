@@ -15,6 +15,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
+    // Check if the coupon code already exists in the database
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM coupon WHERE code = ?");
+    $stmt->execute([$coupon_code]);
+    $existingCoupons = $stmt->fetchColumn();
+
+    if ($existingCoupons > 0) {
+        echo "Coupon code already exists!";
+        exit;
+    }
+
     // Prepare SQL statement to insert coupon into the database
     $stmt = $pdo->prepare("INSERT INTO coupon (code, discount, expiryDate, status) VALUES (?, ?, ?, ?)");
 

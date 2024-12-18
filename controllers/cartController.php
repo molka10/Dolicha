@@ -10,9 +10,9 @@ class PanierController {
 
     public function getProductsByCartId($Idpanier) {
         $query = "
-            SELECT p.nom, p.prix, pi.quantity 
+            SELECT p.Name AS product_name, p.Price AS product_price, p.Stock AS product_stock, p.image AS product_image, pi.quantity
             FROM panier_items pi
-            JOIN produit p ON pi.Idproduit = p.Idproduit 
+            JOIN product p ON pi.Idproduit = p.ID_Product 
             WHERE pi.Idpanier = :Idpanier
         ";
         $stmt = $this->pdo->prepare($query);
@@ -82,9 +82,22 @@ class PanierController {
 
     // Method to add a product to the panier_items table
     public function addProductToCart($panierId, $productId, $quantity) {
-        $query = "INSERT INTO panier_items (Idpanier, Idproduit, quantity) VALUES (:panierId, :productId, :quantity)";
+        // Check if product exists and has enough stock
+        $stockQuery = "SELECT Stock FROM product WHERE ID_Product = :productId";
+        $stockStmt = $this->pdo->prepare($stockQuery);
+        $stockStmt->execute(['productId' => $productId]);
+        $stock = $stockStmt->fetchColumn();
+
+        if ($stock === false || $stock < $quantity) {
+            throw new Exception("Insufficient stock for product ID $productId.");
+        }
+
+        // Insert the product into the cart
+        $query = "INSERT INTO panier_items (Idpanier, Idproduct, quantity) VALUES (:panierId, :productId, :quantity)";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute(['panierId' => $panierId, 'productId' => $productId, 'quantity' => $quantity]);
+
+
     }
 
     // Method to update the cart

@@ -1,45 +1,44 @@
 <?php
-// Product Model without functions, just attributes, getters, and setters
 class Product {
-    private $idproduit;
-    private $nom;
-    private $prix;
+    private $ID_Product;
+    private $Name;
+    private $Price;
+    private $Stock;
+    private $ID_Category;
+    private $Image;
 
-    // Constructor to initialize the product attributes
-    public function __construct($idproduit = null, $nom = '', $prix = 0.00) {
-        $this->idproduit = $idproduit;
-        $this->nom = $nom;
-        $this->prix = $prix;
+    public function __construct($ID_Product, $Name, $Price, $Stock, $ID_Category, $Image = null) {
+        $this->ID_Product = $ID_Product;
+        $this->Name = $Name;
+        $this->Price = $Price;
+        $this->Stock = $Stock;
+        $this->ID_Category = $ID_Category;
+        $this->Image = $Image;
     }
 
-    // Getter for idproduit
-    public function getIdproduit() {
-        return $this->idproduit;
+    public function getId() {
+        return $this->ID_Product;
     }
 
-    // Setter for idproduit
-    public function setIdproduit($idproduit) {
-        $this->idproduit = $idproduit;
+    public function getName() {
+        return $this->Name;
     }
 
-    // Getter for nom
-    public function getNom() {
-        return $this->nom;
+    public function getPrice() {
+        return $this->Price;
     }
 
-    // Setter for nom
-    public function setNom($nom) {
-        $this->nom = $nom;
+    public function getStock() {
+        return $this->Stock;
     }
 
-    // Getter for prix
-    public function getPrix() {
-        return $this->prix;
+    public function getCategoryId() {
+        return $this->ID_Category;
     }
 
-    // Setter for prix
-    public function setPrix($prix) {
-        $this->prix = $prix;
+    public function getImage() {
+        return $this->Image;
     }
 }
+
 ?>

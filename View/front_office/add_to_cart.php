@@ -1,27 +1,27 @@
 <?php
 session_start();
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\ProductController.php';
+
+// Initialize the controller
+$productController = new ProductController($pdo);
 
 // Retrieve POST data
 $productId = filter_input(INPUT_POST, 'productId', FILTER_SANITIZE_NUMBER_INT);
 $requestedQuantity = filter_input(INPUT_POST, 'quantity', FILTER_SANITIZE_NUMBER_INT);
 
-$response = []; // Initialize response array
-
 if ($productId && $requestedQuantity) {
-    // Fetch the product to check its current quantity
-    $stmt = $pdo->prepare("SELECT quantity FROM produit WHERE Idproduit = :id");
-    $stmt->execute(['id' => $productId]);
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Fetch the product using the controller function
+    $product = $productController->getProductById($productId);
 
     if ($product) {
-        $availableQuantity = $product['quantity'];
+        $availableStock = $product->getStock(); // Use object method to get stock
 
-        if ($requestedQuantity <= $availableQuantity) {
-            // Update the product quantity in the database
-            $newQuantity = $availableQuantity - $requestedQuantity;
-            $updateStmt = $pdo->prepare("UPDATE produit SET quantity = :quantity WHERE Idproduit = :id");
-            $updateStmt->execute(['quantity' => $newQuantity, 'id' => $productId]);
+        if ($requestedQuantity <= $availableStock) {
+            // Update the product stock in the database
+            $newStock = $availableStock - $requestedQuantity;
+            $stmt = $pdo->prepare("UPDATE product SET Stock = :stock WHERE ID_Product = :id");
+            $stmt->execute(['stock' => $newStock, 'id' => $productId]);
 
             // Initialize the cart if it doesn't exist
             if (!isset($_SESSION['cart'])) {
@@ -35,22 +35,22 @@ if ($productId && $requestedQuantity) {
                 $_SESSION['cart'][$productId] = $requestedQuantity; // Add new product to cart
             }
 
-            $response['status'] = 'success';
-            $response['message'] = 'Product added to cart successfully!';
+            // Set success message
+            $_SESSION['message'] = 'Product added to cart successfully!';
         } else {
-            $response['status'] = 'error';
-            $response['message'] = "Insufficient stock available. Only $availableQuantity items are in stock.";
+            // Set error message
+            $_SESSION['message'] = "Insufficient stock available. Only $availableStock items are in stock.";
         }
     } else {
-        $response['status'] = 'error';
-        $response['message'] = "Product not found.";
+        // Set error message
+        $_SESSION['message'] = "Product not found.";
     }
 } else {
-    $response['status'] = 'error';
-    $response['message'] = 'Invalid data.';
+    // Set error message
+    $_SESSION['message'] = 'Invalid data.';
 }
 
-// Return JSON response
-header('Content-Type: application/json');
-echo json_encode($response);
+// Redirect back to indexp.php
+header('Location: indexp.php');
+exit;
 ?>

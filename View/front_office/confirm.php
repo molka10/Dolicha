@@ -93,7 +93,7 @@
             <input type="text" id="card-holder" name="card_holder" placeholder="Enter card holder name">
 
             <button type="submit">Pay Now</button>
-            <button type="button" onclick="window.location.href='insurance.php'" style="background-color: #dc3545;">Cancel</button>
+            <button type="button" onclick="window.location.href='indexp.php'" style="background-color: #dc3545;">Cancel</button>
         </form>
     </div>
 
