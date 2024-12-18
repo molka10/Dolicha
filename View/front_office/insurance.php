@@ -1,5 +1,5 @@
 <?php
-require_once 'C:\xampp\htdocs\dolicha0.2\controller\productController.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\productController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 
 // Initialize the ProductController

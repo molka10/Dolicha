@@ -1,5 +1,5 @@
 <?php
-require_once 'C:\xampp\htdocs\dolicha0.2\model\comande.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\models\comande.php';
 
 class CommandeController {
     private $pdo;

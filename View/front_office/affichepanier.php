@@ -1,6 +1,6 @@
 <?php
 // Include necessary files
-require_once 'C:\xampp\htdocs\dolicha0.2\controller\cartController.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\cartController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 // Create a new PDO instance
 try {

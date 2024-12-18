@@ -1,5 +1,5 @@
 <?php
-require_once 'C:\xampp\htdocs\dolicha0.2\model\cart.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\models\cart.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 class PanierController {
     private $pdo;

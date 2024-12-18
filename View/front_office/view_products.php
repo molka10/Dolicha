@@ -1,15 +1,15 @@
 <?php
 // Include necessary files
-require_once 'C:\xampp\htdocs\dolicha0.2\controller\cartController.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\cartController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 
 // Create a new PDO instance
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=dolicha0.2', 'root', ''); // Adjust these values
+    $pdo = new PDO('mysql:host=localhost;dbname=dolicha0.2', 'root', '');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     echo "Connection failed: " . $e->getMessage();
-    exit; // Stop execution if the connection fails
+    exit;
 }
 
 // Create a new CartController object
@@ -18,46 +18,13 @@ $cartController = new PanierController($pdo);
 // Check if the cart ID is set in the URL
 if (isset($_GET['id'])) {
     $Idpanier = $_GET['id'];
-    
-    // Fetch the current details of the cart
-    $cart = $cartController->getExistingCartDetails($Idpanier);
-    
-    if (!$cart) {
-        echo "Cart not found!";
-        exit;
-    }
+    // ... rest of your code
+   // Fetch products associated with the cart
+    $products = $cartController->getProductsByCartId($Idpanier);
 } else {
     echo "No cart ID provided!";
     exit;
 }
-
-// Handle form submission for updating the cart
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $total = $_POST['total'];
-    $status = $_POST['status'];
-
-    // Start a transaction
-    $pdo->beginTransaction();
-    try {
-        // Update the cart
-        if ($cartController->updatePanier($Idpanier, $total, $status)) {
-            
-            // Commit the transaction
-            $pdo->commit();
-            echo "Cart updated successfully!";
-            // Redirect or display a success message
-            header("Location: affichepanier.php");
-            exit;
-        } else {
-            throw new Exception("Failed to update cart.");
-        }
-    } catch (Exception $e) {
-        // Rollback the transaction if something failed
-        $pdo->rollBack();
-        echo "Error: " . $e->getMessage();
-    }
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -228,27 +195,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </section>
-
-    <h1>Update Cart</h1>
-
-<form method="POST" action="" style="max-width: 400px; margin: auto;">
-    <div style="margin-bottom: 15px;">
-        <label for="total">Total:</label>
-        <input type="number" id="total" name="total" value="<?php echo htmlspecialchars($cart['total']); ?>" readonly step="0.01" min="0" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-    </div>
-
-    <div style="margin-bottom: 15px;">
-        <label for="status">Status:</label>
-        <select id="status" name="status" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-            <option value="0" <?php echo $cart['status'] == 0 ? 'selected' : ''; ?>>Not Confirmed</option>
-            <option value="1" <?php echo $cart['status'] == 1 ? 'selected' : ''; ?>>Confirmed</option>
-        </select>
-    </div>
-
-    <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Update Cart</button>
-</form>
-
-<a href="affichepanier.php" class="cancel-link" style="display: block; text-align: center; margin-top: 15px; text-decoration: none; color: #007BFF;">Cancel</a>
-
+    <h1>Products in Cart ID: <?php echo htmlspecialchars($Idpanier); ?></h1>
+    
+    <!-- Display the product information -->
+    <table>
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+    <?php if (!empty($products)): ?>
+        <?php foreach ($products as $product): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($product['nom']); ?></td> <!-- Display product name -->
+                <td><?php echo htmlspecialchars($product['quantity']); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="2">No products found for this cart.</td>
+        </tr>
+    <?php endif; ?>
+</tbody>
+    </table>
+    
+    <a href="affichepanier.php">Back to All Carts</a>
 </body>
 </html>

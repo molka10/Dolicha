@@ -1,5 +1,5 @@
 <?php
-require_once 'C:\xampp\htdocs\dolicha0.2\model\product.php'; // Include the Product model
+require_once 'C:\xampp\htdocs\dolicha0.2\models\product.php'; // Include the Product model
 
 class ProductController {
     private $pdo; // Database connection object
