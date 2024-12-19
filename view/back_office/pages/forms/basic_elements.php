@@ -1,16 +1,36 @@
+<?php
+require_once '../../../../config.php'; // Inclure la configuration de la base de données
+require_once '../../../../controller/userController.php'; // Inclure les fonctions du contrôleur
+
+// Récupérer l'utilisateur sélectionné
+$user = null;
+if (isset($_GET['id_user'])) {
+    $id_user = $_GET['id_user'];
+    $db = (new Database())->getConnection();
+    $user = getUserById($db, $id_user); // Récupérer l'utilisateur par ID
+    if (!$user) {
+        die("Utilisateur introuvable !");
+    }
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Connect Plus</title>
+    <title>dolicha</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="../../assets/vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="../../assets/vendors/css/vendor.bundle.base.css">
     <!-- endinject -->
     <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="../../assets/vendors/select2/select2.min.css">
+    <link rel="stylesheet" href="../../assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <!-- endinject -->
@@ -42,29 +62,8 @@
             </form>
           </div>
           <ul class="navbar-nav navbar-nav-right">
-            <li class="nav-item  dropdown d-none d-md-block">
-              <a class="nav-link dropdown-toggle" id="reportDropdown" href="#" data-toggle="dropdown" aria-expanded="false"> Reports </a>
-              <div class="dropdown-menu navbar-dropdown" aria-labelledby="reportDropdown">
-                <a class="dropdown-item" href="#">
-                  <i class="mdi mdi-file-pdf mr-2"></i>PDF </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">
-                  <i class="mdi mdi-file-excel mr-2"></i>Excel </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">
-                  <i class="mdi mdi-file-word mr-2"></i>doc </a>
-              </div>
-            </li>
-            <li class="nav-item  dropdown d-none d-md-block">
-              <a class="nav-link dropdown-toggle" id="projectDropdown" href="#" data-toggle="dropdown" aria-expanded="false"> Projects </a>
-              <div class="dropdown-menu navbar-dropdown" aria-labelledby="projectDropdown">
-                <a class="dropdown-item" href="#">
-                  <i class="mdi mdi-eye-outline mr-2"></i>View Project </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">
-                  <i class="mdi mdi-pencil-outline mr-2"></i>Edit Project </a>
-              </div>
-            </li>
+            
+            
             <li class="nav-item nav-language dropdown d-none d-md-block">
               <a class="nav-link dropdown-toggle" id="languageDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                 <div class="nav-language-icon">
@@ -241,33 +240,15 @@
           <ul class="nav">
             <li class="nav-item nav-category">Main</li>
             <li class="nav-item">
-              <a class="nav-link" href="../../index.html">
+              <a class="nav-link" href="../../molka.php">
                 <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
                 <span class="menu-title">Dashboard</span>
               </a>
             </li>
+            
+            
             <li class="nav-item">
-              <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-                <span class="icon-bg"><i class="mdi mdi-crosshairs-gps menu-icon"></i></span>
-                <span class="menu-title">UI Elements</span>
-                <i class="menu-arrow"></i>
-              </a>
-              <div class="collapse" id="ui-basic">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="../../pages/ui-features/buttons.html">Buttons</a></li>
-                  <li class="nav-item"> <a class="nav-link" href="../../pages/ui-features/dropdowns.html">Dropdowns</a></li>
-                  <li class="nav-item"> <a class="nav-link" href="../../pages/ui-features/typography.html">Typography</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="../../pages/icons/mdi.html">
-                <span class="icon-bg"><i class="mdi mdi-contacts menu-icon"></i></span>
-                <span class="menu-title">Icons</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="../../pages/forms/basic_elements.html">
+              <a class="nav-link" href="../../pages/forms/basic_elements.php">
                 <span class="icon-bg"><i class="mdi mdi-format-list-bulleted menu-icon"></i></span>
                 <span class="menu-title">Forms</span>
               </a>
@@ -279,35 +260,13 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../../pages/tables/basic-table.php">
+              <a class="nav-link" href="../../pages/tables/basic-table.html">
                 <span class="icon-bg"><i class="mdi mdi-table-large menu-icon"></i></span>
                 <span class="menu-title">Tables</span>
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-                <span class="icon-bg"><i class="mdi mdi-lock menu-icon"></i></span>
-                <span class="menu-title">User Pages</span>
-                <i class="menu-arrow"></i>
-              </a>
-              <div class="collapse" id="auth">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="../../pages/samples/blank-page.html"> Blank Page </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="../../pages/samples/login.html"> Login </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="../../pages/samples/register.html"> Register </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="../../pages/samples/error-404.html"> 404 </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="../../pages/samples/error-500.html"> 500 </a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item documentation-link">
-              <a class="nav-link" href="http://www.bootstrapdash.com/demo/connect-plus-free/jquery/documentation/documentation.html" target="_blank">
-                <span class="icon-bg">
-                  <i class="mdi mdi-file-document-box menu-icon"></i>
-                </span>
-                <span class="menu-title">Documentation</span>
-              </a>
-            </li>
+            
+            
             <li class="nav-item sidebar-user-actions">
               <div class="user-details">
                 <div class="d-flex justify-content-between align-items-center">
@@ -332,15 +291,12 @@
                 </a>
               </div>
             </li>
+            
+
+            
             <li class="nav-item sidebar-user-actions">
               <div class="sidebar-user-menu">
-                <a href="#" class="nav-link"><i class="mdi mdi-speedometer menu-icon"></i>
-                  <span class="menu-title">Take Tour</span></a>
-              </div>
-            </li>
-            <li class="nav-item sidebar-user-actions">
-              <div class="sidebar-user-menu">
-                <a href="#" class="nav-link"><i class="mdi mdi-logout menu-icon"></i>
+                <a href="../view/front_office/login.html" class="nav-link"><i class="mdi mdi-logout menu-icon"></i>
                   <span class="menu-title">Log Out</span></a>
               </div>
             </li>
@@ -349,35 +305,116 @@
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
-          </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:../../partials/_footer.html -->
-          <footer class="footer">
-            <div class="footer-inner-wraper">
-              <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-                <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap dashboard templates</a> from Bootstrapdash.com</span>
-              </div>
+            <div class="page-header">
+              <h3 class="page-title"> Form elements </h3>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="#">Forms</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Form elements</li>
+                </ol>
+              </nav>
             </div>
-          </footer>
-          <!-- partial -->
-        </div>
+            <div class="col-md-6 grid-margin stretch-card">
+              <div class="card">
+                  <div class="card-body">
+                      <h4 class="card-title">Modifier l'Utilisateur</h4>
+                      <p class="card-description">Formulaire de modification</p>
+                      <?php if ($user): ?>
+                          <form class="forms-sample" method="POST" action="../../../../controller/userController.php">
+                              <!-- Hidden Fields -->
+                              <input type="hidden" name="action" value="edit">
+                              <input type="hidden" name="id_user" value="<?= htmlspecialchars($user['id_user']) ?>">
+          
+                              <!-- Nom -->
+                              <div class="form-group row">
+                                  <label for="nom" class="col-sm-3 col-form-label">Nom</label>
+                                  <div class="col-sm-9">
+                                      <input type="text" class="form-control" id="nom" name="Nom"
+                                             value="<?= htmlspecialchars($user['nom']) ?>" placeholder="Nom" required>
+                                  </div>
+                              </div>
+          
+                              <!-- Prénom -->
+                              <div class="form-group row">
+                                  <label for="prenom" class="col-sm-3 col-form-label">Prénom</label>
+                                  <div class="col-sm-9">
+                                      <input type="text" class="form-control" id="prenom" name="Prenom"
+                                             value="<?= htmlspecialchars($user['prenom']) ?>" placeholder="Prénom" required>
+                                  </div>
+                              </div>
+          
+                              <!-- Email -->
+                              <div class="form-group row">
+                                  <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                  <div class="col-sm-9">
+                                      <input type="email" class="form-control" id="email" name="usermail"
+                                             value="<?= htmlspecialchars($user['usermail']) ?>" placeholder="Email" required>
+                                  </div>
+                              </div>
+          
+                              <!-- Rôle -->
+                              <div class="form-group">
+                                  <label for="role">Rôle</label>
+                                  <select class="form-control" id="role" name="userRole">
+                                      <option value="user" <?= $user['userRole'] === 'user' ? 'selected' : '' ?>>User</option>
+                                      <option value="admin" <?= $user['userRole'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                                      <option value="vendeur" <?= $user['userRole'] === 'vendeur' ? 'selected' : '' ?>>Vendeur</option>
+                                  </select>
+                              </div>
+          
+                              <!-- Adresse -->
+                              <div class="form-group row">
+                                  <label for="adress" class="col-sm-3 col-form-label">Adresse</label>
+                                  <div class="col-sm-9">
+                                      <input type="text" class="form-control" id="adress" name="adress"
+                                             value="<?= htmlspecialchars($user['adress']) ?>" placeholder="Adresse" required>
+                                  </div>
+                              </div>
+          
+                              <!-- Nationalité -->
+                              <div class="form-group row">
+                                  <label for="nationalite" class="col-sm-3 col-form-label">Nationalité</label>
+                                  <div class="col-sm-9">
+                                      <input type="text" class="form-control" id="nationalite" name="Nationalite"
+                                             value="<?= htmlspecialchars($user['Nationalite']) ?>" placeholder="Nationalité" required>
+                                  </div>
+                              </div>
+          
+                              <!-- Date de Naissance -->
+                              <div class="form-group row">
+                                  <label for="ddn" class="col-sm-3 col-form-label">Date de Naissance</label>
+                                  <div class="col-sm-9">
+                                      <input type="date" class="form-control" id="ddn" name="ddn"
+                                             value="<?= htmlspecialchars($user['ddn']) ?>" required>
+                                  </div>
+                              </div>
+          
+                              <!-- Numéro -->
+                              <div class="form-group row">
+                                  <label for="num" class="col-sm-3 col-form-label">Numéro</label>
+                                  <div class="col-sm-9">
+                                      <input type="text" class="form-control" id="num" name="num"
+                                             value="<?= htmlspecialchars($user['num']) ?>" placeholder="Numéro" required>
+                                  </div>
+                              </div>
+          
+                              <!-- Buttons -->
+                              <button type="submit" class="btn btn-primary mr-2">Enregistrer</button>
+                              <button type="reset" class="btn btn-light">Annuler</button>
+                          </form>
+                      <?php else: ?>
+                          <p>Utilisateur introuvable.</p>
+                      <?php endif; ?>
+                  </div>
+              </div>
+          </div>
         <!-- main-panel ends -->
       </div>
       <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
     <!-- plugins:js -->
-    <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="../../assets/js/off-canvas.js"></script>
-    <script src="../../assets/js/hoverable-collapse.js"></script>
-    <script src="../../assets/js/misc.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page -->
+   
     <!-- End custom js for this page -->
   </body>
 </html>
