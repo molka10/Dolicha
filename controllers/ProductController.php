@@ -1,7 +1,7 @@
 <?php
-include 'C:\xampp\htdocs\produit\dolicha\config.php';
-include 'C:\xampp\htdocs\produit\dolicha\models\Product.php';
-include 'C:\xampp\htdocs\produit\dolicha\libs\tcpdf\tcpdf.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\models\Product.php';
+//include_once 'C:\xampp\htdocs\dolicha0.2\libs\tcpdf\tcpdf.php';
 class ProductController {
     private $pdo;
 
@@ -9,7 +9,27 @@ class ProductController {
         $this->pdo = $pdo;
     }
 
+    public function getProductById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM product WHERE ID_Product = :id");
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
+        if ($row) {
+            // Create a new Product object
+            return new Product(
+                $row['ID_Product'],
+                $row['Name'],
+                $row['Price'],
+                $row['Stock'],
+                $row['ID_Category'],
+                $row['image']
+            );
+        }
+        return null;
+    }
+    
+    
+
     public function createProduct($name, $price, $stock, $idCategory, $image) {
         try {
             $stmt = $this->pdo->prepare("INSERT INTO product (Name, Price, Stock, ID_Category, Image) VALUES (:name, :price, :stock, :idCategory, :image)");
@@ -56,16 +76,25 @@ class ProductController {
     
     public function getAllProducts($sortBy = null) {
         try {
+            // Default query to fetch all products
             $query = "SELECT ID_Product, Name, Price, Stock, ID_Category, Image FROM product";
+            
+            // Apply sorting if necessary
             if ($sortBy === 'LastEdited') {
                 $query .= " ORDER BY updated_at DESC";
             } elseif ($sortBy === 'Stock') {
                 $query .= " ORDER BY Stock DESC";
             } elseif ($sortBy === 'Price') {
                 $query .= " ORDER BY Price ASC";
+            } else {
+                // Default sorting by product ID if no sort is specified
+                $query .= " ORDER BY ID_Product ASC";
             }
-
+    
+            // Execute the query
             $stmt = $this->pdo->query($query);
+    
+            // Initialize an array to store the products
             $products = [];
 
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -75,16 +104,18 @@ class ProductController {
                     $row['Price'],
                     $row['Stock'],
                     $row['ID_Category'],
-                    $row['Image'] ?? null
+                    $row['Image'] ?? null // Handling null image field
                 );
             }
+    
             return $products;
         } catch (PDOException $e) {
+            // Log the error and return an empty array if something goes wrong
             error_log("Error fetching all products: " . $e->getMessage());
-            return [];
+            return []; // Return an empty array in case of failure
         }
     }
-
+    
     
     public function updateProduct($id, $name, $price, $stock, $idCategory, $image) {
         try {
