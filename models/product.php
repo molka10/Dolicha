@@ -1,44 +1,43 @@
 <?php
 class Product {
-    private $ID_Product;
-    private $Name;
-    private $Price;
-    private $Stock;
-    private $ID_Category;
-    private $Image;
+    private $id;
+    private $name;
+    private $price;
+    private $stock;
+    private $idCategory;
+    private $image; 
 
-    public function __construct($ID_Product, $Name, $Price, $Stock, $ID_Category, $Image = null) {
-        $this->ID_Product = $ID_Product;
-        $this->Name = $Name;
-        $this->Price = $Price;
-        $this->Stock = $Stock;
-        $this->ID_Category = $ID_Category;
-        $this->Image = $Image;
+    public function __construct($id, $name, $price, $stock, $idCategory, $image) {
+        $this->id = $id;
+        $this->name = $name;
+        $this->price = $price;
+        $this->stock = $stock;
+        $this->idCategory = $idCategory;
+        $this->image = $image; 
     }
 
     public function getId() {
-        return $this->ID_Product;
+        return $this->id;
     }
 
     public function getName() {
-        return $this->Name;
+        return $this->name;
     }
 
     public function getPrice() {
-        return $this->Price;
+        return $this->price;
     }
 
     public function getStock() {
-        return $this->Stock;
-    }
-
-    public function getCategoryId() {
-        return $this->ID_Category;
+        return $this->stock;
     }
 
     public function getImage() {
-        return $this->Image;
+        return $this->image; 
+    }
+
+    public function getIdCategory() {
+        return $this->idCategory;
     }
 }
-
 ?>
