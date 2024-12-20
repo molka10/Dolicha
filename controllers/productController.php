@@ -96,8 +96,7 @@ class ProductController {
     
             // Initialize an array to store the products
             $products = [];
-    
-            // Fetch each product and map it to a Product object
+
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $products[] = new Product(
                     $row['ID_Product'],
