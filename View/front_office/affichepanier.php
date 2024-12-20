@@ -141,7 +141,7 @@ $carts = $cartController->getAllPanier();
                 </div>
                 <nav id="nav-menu-container">
                     <ul class="nav-menu">
-                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.php">Home</a></li>
                         <li><a href="about.html">About</a></li>
                         <li><a href="packages.html">Packages</a></li>
                         <li><a href="hotels.html">Hotels</a></li>
@@ -181,7 +181,7 @@ $carts = $cartController->getAllPanier();
             <div class="row d-flex align-items-center justify-content-center">
                 <div class="about-content col-lg-12">
                     <h1 class="text-white">View All Carts</h1>
-                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="insurance.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichepanier.php"> View all carts</a></p>
+                    <p class="text-white link-nav"><a href="index.php">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="indexp.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichepanier.php"> View all carts</a></p>
                 </div>
             </div>
         </div>

@@ -3,9 +3,28 @@ session_start();
 require_once 'C:\xampp\htdocs\dolicha0.2\controllers\productController.php'; 
 require_once 'C:\xampp\htdocs\dolicha0.2\controllers\cartController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\userController.php';
 
+// Create a new PDO instance
+if (!isset($_SESSION['user'])) {
+    header("Location: accueil.php"); // Rediriger vers la page de connexion si non connecté
+    exit();
+}
+
+// Si le bouton logout est cliqué, on détruit la session et on redirige vers la page de connexion
+if (isset($_POST['logout'])) {
+    session_unset(); // Détruit toutes les variables de session
+    session_destroy(); // Détruit la session
+    header("Location: accueil.php"); // Redirige vers la page de connexion
+    exit();
+}
+
+$userController = new UserController($pdo);
+
+// Récupérez le nom de l'utilisateur
+$user_id = $_SESSION['user']['id'];
 if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
-    $Iduser = 1; // Replace with the actual user ID
+    $Iduser = $user_id; // Replace with the actual user ID
     $cartController = new PanierController($pdo);
     
     // Calculate the total price of the cart

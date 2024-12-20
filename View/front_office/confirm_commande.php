@@ -1,6 +1,25 @@
 <?php
 session_start();
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\userController.php';
+// Create a new PDO instance
+if (!isset($_SESSION['user'])) {
+    header("Location: accueil.php"); // Rediriger vers la page de connexion si non connecté
+    exit();
+}
+
+// Si le bouton logout est cliqué, on détruit la session et on redirige vers la page de connexion
+if (isset($_POST['logout'])) {
+    session_unset(); // Détruit toutes les variables de session
+    session_destroy(); // Détruit la session
+    header("Location: accueil.php"); // Redirige vers la page de connexion
+    exit();
+}
+
+$userController = new UserController($pdo);
+
+// Récupérez le nom de l'utilisateur
+$user_id = $_SESSION['user']['id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Collect POST data
@@ -13,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     // Assuming the user ID and panier ID are available
-    $iduser = 1; // This should be the actual user ID from your session or database
+    $iduser = $user_id; // This should be the actual user ID from your session or database
     $idpanier = $orderId; // Use the provided order ID (or you can retrieve it as needed)
 
     // Check if all fields are filled

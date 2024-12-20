@@ -2,21 +2,32 @@
 // Include necessary files
 require_once 'C:\xampp\htdocs\dolicha0.2\controllers\ComandeController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
-
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\userController.php';
+session_start();
 // Create a new PDO instance
-try {
-    $pdo = new PDO('mysql:host=localhost;dbname=dolicha0.2', 'root', ''); // Adjust these values
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
-    exit; // Stop execution if the connection fails
+if (!isset($_SESSION['user'])) {
+    header("Location: accueil.php"); // Rediriger vers la page de connexion si non connecté
+    exit();
 }
+
+// Si le bouton logout est cliqué, on détruit la session et on redirige vers la page de connexion
+if (isset($_POST['logout'])) {
+    session_unset(); // Détruit toutes les variables de session
+    session_destroy(); // Détruit la session
+    header("Location: accueil.php"); // Redirige vers la page de connexion
+    exit();
+}
+
+$userController = new UserController($pdo);
+
+// Récupérez le nom de l'utilisateur
+$user_id = $_SESSION['user']['id'];
 
 // Create a new CommandeController object
 $commandeController = new CommandeController($pdo);
 
 // Fetch all commandes using the CommandeController
-$commandes = $commandeController->getAllCommandes();
+$commandes = $commandeController->getCommandeByIdUser($user_id);
 ?>
 
 <!DOCTYPE html>
@@ -142,7 +153,7 @@ $commandes = $commandeController->getAllCommandes();
                 </div>
                 <nav id="nav-menu-container">
                     <ul class="nav-menu">
-                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.php">Home</a></li>
                         <li><a href="about.html">About</a></li>
                         <li><a href="packages.html">Packages</a></li>
                         <li><a href="hotels.html">Hotels</a></li>
@@ -181,7 +192,7 @@ $commandes = $commandeController->getAllCommandes();
             <div class="row d-flex align-items-center justify-content-center">
                 <div class="about-content col-lg-12">
                     <h1 class="text-white">Historique</h1>
-                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="indexp.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichecommande.php">Historique</a></p>
+                    <p class="text-white link-nav"><a href="index.php">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="indexp.php"> Products</a> <span class="lnr lnr-arrow-right"></span> <a href="affichecommande.php">Historique</a></p>
                 </div>
             </div>
         </div>

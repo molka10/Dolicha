@@ -145,7 +145,7 @@ $total = 0;
                 </div>
                 <nav id="nav-menu-container">
                     <ul class="nav-menu">
-                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.php">Home</a></li>
                         <li><a href="about.html">About</a></li>
                         <li><a href="packages.html">Packages</a></li>
                         <li><a href="hotels.html">Hotels</a></li>
@@ -186,7 +186,7 @@ $total = 0;
                 <div class="about-content col-lg-12 text-center">
                     <h1 class="text-white" style="font-size: 2rem; font-weight: bold;">View Cart</h1>
                     <p class="text-white link-nav" style="font-size: 1.2rem;">
-                        <a href="index.html" class="text-white">Home </a>  
+                        <a href="index.php" class="text-white">Home </a>  
                         <span class="lnr lnr-arrow-right"></span>  
                         <a href="indexp.php" class="text-white"> Products</a> 
                         <span class="lnr lnr-arrow-right"></span>  

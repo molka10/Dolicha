@@ -3,15 +3,35 @@
 require_once 'comandeController.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\config.php';
 require_once 'C:\xampp\htdocs\dolicha0.2\controllers\CategoryController.php';
+require_once 'C:\xampp\htdocs\dolicha0.2\controllers\userController.php';
+session_start();
 
-// Create a new PDO instance
-try {
-    $pdo = new PDO('mysql:host=localhost;dbname=dolicha0.2', 'root', ''); // Adjust these values
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
-    exit; // Stop execution if the connection fails
+if (!isset($_SESSION['user'])) {
+  header("Location: ../front_office/login.php"); // Rediriger vers la page de connexion si non connecté
+  exit();
 }
+
+// Si le bouton logout est cliqué, on détruit la session et on redirige vers la page de connexion
+if (isset($_POST['logout'])) {
+  session_unset(); // Détruit toutes les variables de session
+  session_destroy(); // Détruit la session
+  header("Location: accueil.php"); // Redirige vers la page de connexion
+  exit();
+}
+
+$userController = new UserController($pdo);
+
+// Récupérez le nom de l'utilisateur
+$user_id = $_SESSION['user']['id']; 
+$nom = $userController->getUserName($user_id);
+
+// Vérifier si l'utilisateur est connecté
+
+
+// Récupérer la valeur de recherche (si présente)
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+
+$users= $userController->getAllUsers($search);
 
 // Create a new CommandeController object
 $commandeController = new CommandeController($pdo);
@@ -43,7 +63,7 @@ if (!empty($tab)) {
     echo "<tr><td colspan='3'>No categories found.</td></tr>";  
 }
 ?>
-?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -252,8 +272,9 @@ tr:hover {
                 <div class="nav-profile-img">
                   <img src="assets/images/faces/face28.png" alt="image">
                 </div>
+              
                 <div class="nav-profile-text">
-                  <p class="mb-1 text-black">Henry Klein</p>
+                  <p class="mb-1 text-black"><?php echo" $nom" ?></p>
                 </div>
               </a>
               <div class="dropdown-menu navbar-dropdown dropdown-menu-right p-0 border-0 font-size-sm" aria-labelledby="profileDropdown" data-x-placement="bottom-end">
@@ -286,13 +307,18 @@ tr:hover {
                     <span>Lock Account</span>
                     <i class="mdi mdi-lock ml-1"></i>
                   </a>
-                  <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
+                  <php><?php if (isset($_SESSION['user'])): ?>
+    <!-- Afficher le bouton Logout si l'utilisateur est connecté -->
+                  <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="../front_office/logout.php">
                     <span>Log Out</span>
                     <i class="mdi mdi-logout ml-1"></i>
                   </a>
+                  <?php endif; ?></php>
+
                 </div>
               </div>
             </li>
+            
             <li class="nav-item dropdown">
               <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                 <i class="mdi mdi-email-outline"></i>
@@ -986,6 +1012,175 @@ if ($action === 'edit' && $id) {
             <!-- End of PHP Loop -->
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="content">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+      </div>
+              <h2 class="text-dark font-weight-bold mb-2"> Overview dashboard </h2>
+              <div class="d-sm-flex justify-content-xl-between align-items-center mb-2">
+                
+                <div class="btn-group bg-white p-3" role="group" aria-label="Basic example">
+                  
+
+            <div class="d-xl-flex justify-content-between align-items-start">
+            <div class="card">
+            <h4>User List</h4>
+
+      
+
+        <!-- Barre de recherche -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <input type="text" id="searchInput" placeholder="Rechercher un utilisateur..." style="width: 80%; padding: 10px; font-size: 16px; border: 1px solid #ddd;">
+        </div>
+
+        <div class="filter-container">
+    <label for="roleFilter">Filtrer par rôle :</label>
+    <select id="roleFilter">
+        <option value="all">Tous</option>
+        <option value="User">User</option>
+        <option value="Admin">Admin</option>
+        <option value="Vendeur">Vendeur</option>
+    </select>
+</div>
+
+<div class="table-responsive">
+    <table class="table" id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Role</th>
+                <th>Address</th>
+                <th>Nationality</th>
+                <th>Date of Birth</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $user): ?>
+                <tr data-role="<?= htmlspecialchars($user['userRole']) ?>">
+                    <td><?= htmlspecialchars($user['id_user']) ?></td>
+                    <td data-name="<?= htmlspecialchars($user['nom']) ?>"><?= htmlspecialchars($user['nom']) ?></td>
+                    <td><?= htmlspecialchars($user['prenom']) ?></td>
+                    <td><?= htmlspecialchars($user['usermail']) ?></td>
+                    <td><?= '********' ?></td>
+                    <td><?= htmlspecialchars($user['userRole']) ?></td>
+                    <td><?= htmlspecialchars($user['adress']) ?></td>
+                    <td><?= htmlspecialchars($user['Nationalite']) ?></td>
+                    <td><?= htmlspecialchars($user['ddn']) ?></td>
+                    <td><?= htmlspecialchars($user['num']) ?></td>
+                    <td>
+                        <form method="POST" action="../../controllers/userController.php" style="display:inline;">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+
+                        <form method="POST" action="/dolicha0.2/View/front_office/signup.php" style="display:">
+                            <input type="hidden" name="action" value="add">
+                            <button type="submit" class="btn btn-success">Add User</button>
+                        </form>
+
+                        <form method="GET" action="/dolicha0.2/View/back_office/pages/forms/basic_elements.php" style="display:inline;">
+                            <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
+                            <button type="submit" class="btn btn-warning">Edit</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <div id="pagination" class="pagination"></div>
+</div>
+
+
+<!-- JavaScript pour la recherche dynamique -->
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#userTable tbody tr');
+
+        rows.forEach(row => {
+            const nom = row.querySelector('td[data-name]').textContent.toLowerCase();
+            if (nom.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    document.getElementById('roleFilter').addEventListener('change', function() {
+    const selectedRole = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#userTable tbody tr');
+
+    rows.forEach(row => {
+        const role = row.getAttribute('data-role').toLowerCase();
+        if (selectedRole === 'all' || role === selectedRole) {
+            row.style.display = ''; // Affiche la ligne
+        } else {
+            row.style.display = 'none'; // Cache la ligne
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
+    const rowsPerPage = 5; // Nombre de lignes par page
+    const table = document.getElementById('userTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const pagination = document.getElementById('pagination');
+
+    function displayPage(pageNumber) {
+        const start = (pageNumber - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        rows.forEach((row, index) => {
+            row.style.display = index >= start && index < end ? '' : 'none';
+        });
+    }
+
+    function createPaginationButtons(totalRows, rowsPerPage) {
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+        pagination.innerHTML = ''; // Réinitialise les boutons
+
+        for (let i = 1; i <= totalPages; i++) {
+            const button = document.createElement('button');
+            button.textContent = i;
+            button.classList.add('pagination-button');
+            button.addEventListener('click', () => {
+                displayPage(i);
+                setActiveButton(i);
+            });
+            pagination.appendChild(button);
+        }
+
+        // Afficher la première page au chargement
+        if (totalPages > 0) {
+            displayPage(1);
+            setActiveButton(1);
+        }
+    }
+
+    function setActiveButton(activePage) {
+        const buttons = pagination.querySelectorAll('.pagination-button');
+        buttons.forEach(button => {
+            button.classList.toggle('active', button.textContent == activePage);
+        });
+    }
+
+    // Initialisation
+    createPaginationButtons(rows.length, rowsPerPage);
+});
+
+</script>
       </div>
     </div>
   </div>

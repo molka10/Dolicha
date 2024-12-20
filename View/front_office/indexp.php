@@ -79,7 +79,7 @@ function imageExists($url) {
 				  </div>
 				  <nav id="nav-menu-container">
 					<ul class="nav-menu">
-					  <li><a href="index.html">Home</a></li>
+					  <li><a href="index.php">Home</a></li>
 					  <li><a href="about.html">About</a></li>
 					  <li><a href="packages.html">Packages</a></li>
 					  <li><a href="hotels.html">Hotels</a></li>
@@ -119,7 +119,7 @@ function imageExists($url) {
 						<h1 class="text-white">
 							boutique			
 						</h1>	
-						<p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="indexp.php"> boutique</a></p>
+						<p class="text-white link-nav"><a href="index.php">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="indexp.php"> boutique</a></p>
 					</div>	
 				</div>
 			</div>

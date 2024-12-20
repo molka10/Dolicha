@@ -14,6 +14,14 @@ class CommandeController {
         $stmt->execute(['Iduser' => $Iduser, 'Idpanier' => $Idpanier, 'date' => $date, 'status' => $status]);
         return $this->pdo->lastInsertId();
     }
+    public function getCommandeByIdUser($iduser) {
+        $stmt = $this->pdo->prepare("SELECT * FROM commande WHERE iduser = :iduser");
+        $stmt->execute(['iduser' => $iduser]);
+        $data = $stmt->fetchALL(PDO::FETCH_ASSOC); 
+        return $data;
+    
+    }
+
 
     public function getCommandeById($id)
 {
